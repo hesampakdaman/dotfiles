@@ -1,3 +1,3 @@
 for d in */ ; do
-    stow --no-folding $d -t ~
+    stow --adopt --no-folding $d -t ~
 done
