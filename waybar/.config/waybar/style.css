@@ -1,4 +1,4 @@
-@import "mocha.css";
+@import "colors.css";
 
 * {
     font-family: "Iosevka Nerd Font Mono";
@@ -11,12 +11,8 @@
 
 window#waybar {
     background-color: transparent;
-    /* color: #ffffff; */
     transition-property: background-color;
     transition-duration: .5s;
-    /* background-color: @base; */
-    /* border: 1.5px solid; */
-    /* border-color: @surface0; */
     border-radius: 12px;
 }
 
@@ -24,7 +20,7 @@ window#waybar {
     margin: 0px;
     padding: 0px 10px;
     border-radius: 8px;
-    background-color: @base;
+    background-color: @base00;
 }
 
 #workspaces button {
@@ -32,88 +28,51 @@ window#waybar {
     padding: 4px;
     border-radius: 20px;
     border: 1.5px solid;
-    border-color: @surface0;
-    background-color: @surface0;
-    color: @text;
+    background-color: @base00;
+    border-color: @base01;
+    color: @base04;
     transition: 0.2s all;
 }
 
 #workspaces button:hover {
-    /* border: 1.5px solid; */
-    border-color: @surface1;
-    background-color: @surface0;
-    color: @mauve;
+    color: @base0D;
+    border-color: @base03;
 }
 
 #workspaces button.active {
-    border-color: @mauve;
-    background-color: @mauve;
-    color: @base;
-    /* padding: 8px 6px; */
+    border-color: @base0D;
+    background-color: @base0D;
+    color: @base00;
 }
 
 #workspaces button.active:hover {
-    border-color: @mauve;
+    border-color: @base0D;
 }
 
-#clock {
+#clock, #tray, #wireplumber, #battery {
     margin: 5px 2px;
     padding: 4px 12px;
     border-radius: 8px;
     border: 1.5px solid;
-    border-color: @surface0;
-    background-color: @surface0;
-    color: @text;
+    background-color: @base00;
+    color: @base04;
+    border-color: @base01;
     transition: 0.2s all;
 }
 
-#tray {
-    margin: 5px 2px;
-    padding: 4px 12px;
-    border-radius: 8px;
-    border: 1.5px solid;
-    border-color: @surface0;
-    background-color: @surface0;
-    color: @text;
-    transition: 0.2s all;
-}
-
-#clock:hover {
-    border: 1.5px solid;
-    border-color: @surface1;
-    background-color: @surface0;
-    color: @mauve;
-}
-
-#wireplumber {
-    margin: 5px 3px;
-    padding: 4px 12px;
-    border-radius: 8px;
-    border: 1.5px solid;
-    border-color: @surface0;
-    background-color: @surface0;
-    color: @text;
-    transition: 0.2s all;
-}
-
-#wireplumber:hover {
-    border: 1.5px solid;
-    border-color: @surface1;
-    background-color: @surface0;
-    color: @mauve;
+#clock:hover, #tray:hover, #wireplumber:hover, #battery:hover {
+    background-color: @base00;
+    color: @base0D;
 }
 
 #wireplumber.muted {
-    color: @red;
+    color: @base08;
 }
 
-#battery {
-    margin: 5px;
-    padding: 4px 12px;
-    border-radius: 8px;
-    border: 1.5px solid;
-    border-color: @surface0;
-    background-color: @base;
-    color: @mauve;
-    transition: 0.2s all;
+#battery.critical {
+    color: @base08;
+}
+
+#battery.charging {
+    color: @base0B;
 }
