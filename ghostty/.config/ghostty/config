@@ -1,6 +1,5 @@
 # appearance
-# theme = Catppuccin Mocha
-theme = dark:Catppuccin Mocha,light:Catppuccin Latte
+config-file = ?"~/.config/ghostty/theme.conf"
 window-decoration = false
 window-padding-x = 15
 window-padding-y = 10,8
