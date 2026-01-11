@@ -24,6 +24,13 @@
     "scroll-step": 1,
     "on-click": "wpctl set-mute @DEFAULT_SINK@ toggle"
   },
+  "bluetooth": {
+    "format": "{icon}",
+    "format-icons": {
+      "default": ["ᛒ"]
+    },
+    "on-click": "emacsclient -c -n --eval \"(bluetooth-list-devices)\" > /dev/null"
+  },
   "battery": {
     "interval": 60,
     "states": {
