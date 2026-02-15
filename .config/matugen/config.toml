@@ -1,0 +1,25 @@
+[config]
+version_check = false
+caching = false
+
+[config.wallpaper]
+set = true
+command = "awww img --transition-type center {{ image }}"
+
+[templates.ashell]
+input_path = './ashell.toml'
+output_path = '~/.config/ashell/config.toml'
+
+[templates.ghostty]
+input_path = './ghostty'
+output_path = '~/.config/ghostty/themes/Matugen'
+post_hook = 'pkill -SIGUSR2 ghostty'
+
+[templates.hyprland]
+input_path = './hyprland-colors.conf'
+output_path = '~/.config/hypr/colors.conf'
+
+[templates.mako]
+input_path = './mako'
+output_path = '~/.config/mako/mako-colors'
+post_hook = 'makoctl reload'
