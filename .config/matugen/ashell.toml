@@ -1,4 +1,4 @@
-position = "Top"
+position = "Bottom"
 
 [modules]
 left = [ "Workspaces" ]
