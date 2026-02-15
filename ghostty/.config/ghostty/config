@@ -1,5 +1,5 @@
 # appearance
-config-file = ?"~/.config/ghostty/theme.conf"
+theme = "Matugen"
 window-decoration = false
 window-padding-x = 15
 window-padding-y = 10,8
