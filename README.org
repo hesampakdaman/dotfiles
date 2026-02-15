@@ -1,4 +1,2 @@
 * GNU Stow
-Install GNU Stow and link packages, e.g. =stow bash=. Alternatively, run
-=./stowit.sh= to link all packages in this folder (except bin and misc).
-
+Install GNU Stow to link all configuration files =stow .=.
