@@ -46,8 +46,8 @@ alias la='ls -A'
 alias l='ls -CF'
 
 # alias
-if [ -d $dotfiles ]; then
-    source $dotfiles/bash/.bash_aliases
+if [ -f $HOME/.bash_aliases ]; then
+    source $HOME/.bash_aliases
 fi
 
 if ! shopt -oq posix; then
