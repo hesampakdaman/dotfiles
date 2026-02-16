@@ -23,3 +23,8 @@ output_path = '~/.config/hypr/colors.conf'
 input_path = './mako'
 output_path = '~/.config/mako/mako-colors'
 post_hook = 'makoctl reload'
+
+[templates.ps1]
+input_path = "./bash_ps1.sh"
+output_path = "~/.bash_ps1.sh"
+post_hook = "source ~/.bash_ps1.sh"

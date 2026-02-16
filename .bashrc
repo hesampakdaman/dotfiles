@@ -27,6 +27,7 @@ dotfiles=$HOME/dotfiles
 # simple prompt that goes well with TRAMP
 PROMPT_DIRTRIM=2
 export PS1="\e[35;1m[\h][\w]$ \e[m"
+[ -f ~/.bash_ps1.sh ] && source ~/.bash_ps1.sh
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -46,9 +47,7 @@ alias la='ls -A'
 alias l='ls -CF'
 
 # alias
-if [ -f $HOME/.bash_aliases ]; then
-    source $HOME/.bash_aliases
-fi
+[ -f $HOME/.bash_aliases ] && source $HOME/.bash_aliases
 
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then

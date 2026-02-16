@@ -1,0 +1,11 @@
+NORMAL 00
+RESET 0
+
+DIR 01;38;2;{{colors.primary.default.red}};{{colors.primary.default.green}};{{colors.primary.default.blue}}
+LINK 00;38;2;{{colors.tertiary_container.default.red}};{{colors.tertiary_container.default.green}};{{colors.tertiary_container.default.blue}}
+EXEC 01;38;2;{{colors.secondary.default.red}};{{colors.secondary.default.green}};{{colors.secondary.default.blue}}
+ORPHAN 01;38;2;{{colors.error.default.red}};{{colors.error.default.green}};{{colors.error.default.blue}}
+FIFO 00;38;2;{{colors.on_surface_variant.default.red}};{{colors.on_surface_variant.default.green}};{{colors.on_surface_variant.default.blue}}
+SOCK 00;38;2;{{colors.inverse_primary.default.red}};{{colors.inverse_primary.default.green}};{{colors.inverse_primary.default.blue}}
+BLK 00;38;2;{{colors.outline.default.red}};{{colors.outline.default.green}};{{colors.outline.default.blue}}
+CHR 00;38;2;{{colors.primary_fixed_dim.default.red}};{{colors.primary_fixed_dim.default.green}};{{colors.primary_fixed_dim.default.blue}}
