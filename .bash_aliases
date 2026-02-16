@@ -14,7 +14,9 @@ alias sbashprofile="source ~/dotfiles/bash/.bash_profile"
 alias sbashrc="source ~/dotfiles/bash/.bashrc"
 
 # emacs
-alias e='emacsclient -nw'
+alias e='emacsclient --create-frame'
+alias er='emacsclient --reuse-frame'
+alias et='emacsclient --tty'
 
 # vim
 alias vi="vim"
