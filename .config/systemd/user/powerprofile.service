@@ -1,0 +1,10 @@
+[Unit]
+Description=Set power profile to power-saver
+After=dbus.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/powerprofilesctl set power-saver
+
+[Install]
+WantedBy=default.target
