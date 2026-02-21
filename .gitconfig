@@ -1,0 +1,74 @@
+[user]
+    name = Hesam Pakdaman
+
+[includeIf "gitdir:~/"]
+    path = ~/.gitconfig-home
+
+[includeIf "gitdir:~/repos/@h/"]
+    path = ~/.gitconfig-home
+
+[includeIf "gitdir:~/repos/@w/"]
+    path = ~/.gitconfig-work
+
+[init]
+	defaultBranch = main
+
+# Core & General Settings
+[core]
+	excludesfile = ~/.gitignore
+    editor = emacsclient -c
+
+[help]
+	autocorrect = prompt
+
+[grep]
+    lineNumber = true
+    patternType = perl
+
+# User Interface & Output
+[column]
+	ui = auto
+
+# Branch & Tag Management
+[branch]
+	sort = -committerdate
+
+[tag]
+	sort = version:refname
+
+# Commit & Diff Options
+[diff]
+	colorMoved = plain
+	mnemonicPrefix = true
+	renames = true
+
+[commit]
+	verbose = true
+
+# Integration: Merge, Rebase, Pull
+[rebase]
+	autoSquash = true
+	autoStash = true
+	updateRefs = true
+
+[pull]
+	rebase = true
+
+# Remote Collaboration
+[push]
+	default = simple
+	autoSetupRemote = true
+	followTags = true
+
+[fetch]
+	prune = true
+	pruneTags = true
+	all = true
+
+[url "ssh://git@github.com/"]
+    insteadOf = https://github.com/
+
+# Conflict Resolution
+[rerere]
+	enabled = true
+	autoupdate = true
