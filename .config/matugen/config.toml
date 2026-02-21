@@ -4,7 +4,9 @@ caching = false
 
 [config.wallpaper]
 set = true
-command = "awww img --transition-type center {{ image }}"
+command = "awww img {{ image }} --transition-type wipe"
+args = []
+
 
 [templates.ashell]
 input_path = './ashell.toml'
