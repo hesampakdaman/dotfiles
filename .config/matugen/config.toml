@@ -17,6 +17,11 @@ input_path = "./dircolors"
 output_path = "~/.dircolors"
 post_hook = "eval $(dircolors ~/.dircolors)"
 
+[templates.emacs]
+input_path = "./emacs.el"
+output_path = "~/.emacs.d/matugen.el"
+post_hook = "emacsclient -e '(load \"~/.emacs.d/matugen.el\")'"
+
 [templates.ghostty]
 input_path = './ghostty'
 output_path = '~/.config/ghostty/themes/Matugen'
