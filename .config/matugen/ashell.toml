@@ -6,7 +6,7 @@ center = []
 right = [ "Clock", [ "Settings" ] ]
 
 [appearance]
-font_name = "JetBrainsMono Nerd Font Mono"
+font_name = "JetBrainsMono Nerd Font"
 scale_factor = 1.15
 style = "Islands"
 
