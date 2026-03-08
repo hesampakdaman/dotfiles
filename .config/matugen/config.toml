@@ -4,9 +4,8 @@ caching = false
 
 [config.wallpaper]
 set = true
-command = "awww img {{ image }} --transition-type random"
+command = "awww img {{ image }} --transition-type random --transition-duration 2.0"
 args = []
-
 
 [templates.ashell]
 input_path = './ashell.toml'
