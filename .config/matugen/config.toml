@@ -4,7 +4,7 @@ caching = false
 
 [config.wallpaper]
 set = true
-command = "awww img {{ image }} --transition-type wipe"
+command = "awww img {{ image }} --transition-type random"
 args = []
 
 
