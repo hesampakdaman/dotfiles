@@ -8,8 +8,8 @@ command = "awww img {{ image }} --transition-type random --transition-duration 2
 args = []
 
 [templates.ashell]
-input_path = './ashell.toml'
-output_path = '~/.config/ashell/config.toml'
+input_path = "./ashell.toml"
+output_path = "~/.config/ashell/config.toml"
 
 [templates.dircolors]
 input_path = "./dircolors"
@@ -22,18 +22,18 @@ output_path = "~/.emacs.d/matugen.el"
 post_hook = "emacsclient -e '(load \"~/.emacs.d/matugen.el\")'"
 
 [templates.ghostty]
-input_path = './ghostty'
-output_path = '~/.config/ghostty/themes/Matugen'
-post_hook = 'pkill -SIGUSR2 ghostty'
+input_path = "./ghostty"
+output_path = "~/.config/ghostty/themes/Matugen"
+post_hook = "pkill -SIGUSR2 ghostty"
 
 [templates.hyprland]
-input_path = './hyprland-colors.conf'
-output_path = '~/.config/hypr/colors.conf'
+input_path = "./hyprland-colors.conf"
+output_path = "~/.config/hypr/colors.conf"
 
 [templates.mako]
-input_path = './mako'
-output_path = '~/.config/mako/mako-colors'
-post_hook = 'makoctl reload'
+input_path = "./mako"
+output_path = "~/.config/mako/mako-colors"
+post_hook = "makoctl reload"
 
 [templates.ps1]
 input_path = "./bash_ps1.sh"
