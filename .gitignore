@@ -3,3 +3,4 @@
 /.config/hypr/colors.conf
 /.config/hypr/monitors.conf
 /.dircolors
+/.config/ghostty/local.conf

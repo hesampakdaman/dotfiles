@@ -1,3 +1,5 @@
+config-file = ?local.conf
+
 # appearance
 theme = "Matugen"
 window-decoration = false
