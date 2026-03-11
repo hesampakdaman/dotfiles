@@ -1,6 +1,7 @@
 config-file = ?local.conf
 
 # appearance
+font-family = JetBrainsMono Nerd Font
 theme = "Matugen"
 window-decoration = false
 window-padding-x = 15
