@@ -11,6 +11,11 @@ args = []
 input_path = "./ashell.toml"
 output_path = "~/.config/ashell/config.toml"
 
+[templates.darkman]
+input_path = "./darkman"
+output_path = "./darkman"
+post_hook = "darkman set {{ mode }}"
+
 [templates.dircolors]
 input_path = "./dircolors"
 output_path = "~/.dircolors"
