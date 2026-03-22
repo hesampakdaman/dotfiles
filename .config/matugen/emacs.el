@@ -1,2 +1,8 @@
 ;; -*- lexical-binding: t; -*-
-(hesam/pick-ef-theme-by-hsl "{{colors.primary.default.hsl}}" "{{colors.surface.default.hsl}}")
+;; -*- lexical-binding: t; -*-
+(hesam-matugen-pick-ef-theme-by-hsl
+ :primary "{{colors.primary.default.hsl}}"
+ :secondary "{{colors.secondary.default.hsl}}"
+ :tertiary "{{colors.tertiary.default.hsl}}"
+ :surface "{{colors.surface.default.hsl}}"
+ :surface-variant "{{colors.surface_variant.default.hsl}}")
