@@ -65,8 +65,10 @@ if ! shopt -oq posix; then
   fi
 fi
 
-if [ -f /usr/share/doc/fzf/examples/key-bindings.bash ]; then
-    . /usr/share/doc/fzf/examples/key-bindings.bash
+# fzf key bindings and completion for Arch
+if [ -f /usr/share/fzf/key-bindings.bash ]; then
+  source /usr/share/fzf/key-bindings.bash
+  source /usr/share/fzf/completion.bash
 fi
 
 if command -v zoxide >/dev/null 2>&1; then
