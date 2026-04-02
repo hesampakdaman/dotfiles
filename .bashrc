@@ -68,5 +68,7 @@ if command -v zoxide >/dev/null 2>&1; then
     eval "$(zoxide init bash)"
 fi
 
-[[ -f /usr/bin/keychain ]] && keychain --nogui --quiet ~/.ssh/id_ed25519
-[[ -f $HOME/.keychain/$HOSTNAME-sh ]] && source $HOME/.keychain/$HOSTNAME-sh
+if command -v keychain >/dev/null 2>&1 && [ -f ~/.ssh/id_ed25519 ]; then
+    keychain --nogui --quiet ~/.ssh/id_ed25519
+    [[ -f $HOME/.keychain/$(hostname)-sh ]] && source $HOME/.keychain/$(hostname)-sh
+fi
