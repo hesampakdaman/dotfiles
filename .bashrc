@@ -1,15 +1,20 @@
 #
 # ~/.bashrc
 #
+
+# disable freeze C-s
+[[ $- == *i* ]] && stty -ixon
+
+# lang
 export LC_CTYPE=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
-### editor
+# editor
 export EDITOR="emacsclient -c"
 export SUDO_EDITOR="emacsclient -c"
 export VISUAL="emacsclient -c"
 
-### history
+# history
 HISTCONTROL=ignoreboth
 HISTFILE=~/.bash_history
 HISTSIZE=9999
@@ -55,9 +60,6 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-
-# disable freeze C-s
-[[ $- == *i* ]] && stty -ixon
 
 if [ -f /usr/share/doc/fzf/examples/key-bindings.bash ]; then
     . /usr/share/doc/fzf/examples/key-bindings.bash
