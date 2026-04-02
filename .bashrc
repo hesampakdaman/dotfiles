@@ -69,5 +69,6 @@ if [ -f /usr/share/doc/fzf/examples/key-bindings.bash ]; then
     . /usr/share/doc/fzf/examples/key-bindings.bash
 fi
 
+[[ -f /usr/bin/zoxide ]] && eval "$(zoxide init bash)"
 [[ -f /usr/bin/keychain ]] && keychain --nogui --quiet ~/.ssh/id_ed25519
 [[ -f $HOME/.keychain/$HOSTNAME-sh ]] && source $HOME/.keychain/$HOSTNAME-sh
