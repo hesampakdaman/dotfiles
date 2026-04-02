@@ -37,7 +37,7 @@ PROMPT_DIRTRIM=2
 export PS1="[\h][\w]\$ "
 if [[ "$TERM" != "dumb" ]]; then
     # This runs the source command only in "real" terminals like Ghostty
-    PROMPT_COMMAND='[ -f ~/.bash_ps1.sh ] && source ~/.bash_ps1.sh'
+    PROMPT_COMMAND="$PROMPT_COMMAND; [ -f ~/.bash_ps1.sh ] && source ~/.bash_ps1.sh"
 fi
 
 # enable color support of ls and also add handy aliases
