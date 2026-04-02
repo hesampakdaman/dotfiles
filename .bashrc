@@ -79,9 +79,12 @@ if [ -f /usr/share/fzf/key-bindings.bash ]; then
     source /usr/share/fzf/key-bindings.bash
     source /usr/share/fzf/completion.bash
     export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow'
-    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-    export FZF_CTRL_T_OPTS="--preview 'bat --color=always --line-range :100 {}'"
+    export FZF_DEFAULT_OPTS='--height=100% --layout=reverse --border'
 
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    export FZF_CTRL_T_OPTS="
+      --preview 'bat --color=always --style=numbers {}'
+    "
 fi
 
 # zoxide (smart cd)
