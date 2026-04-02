@@ -1,0 +1,41 @@
+# VCS
+.git
+.hg
+.svn
+
+# Build artifacts
+zig-cache
+zig-out
+
+# Node
+node_modules
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.venv
+venv
+.mypy_cache
+.pytest_cache
+.ipynb_checkpoints
+
+# Rust (already mostly covered by target)
+**/*.rs.bk
+
+# Caches / temp
+.cache
+.tmp
+tmp
+.direnv
+
+# Editor / tooling
+.idea
+.vscode
+.emacs.d
+.lsp
+.ccls-cache
+
+# OS noise
+.DS_Store
