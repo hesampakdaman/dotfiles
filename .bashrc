@@ -28,8 +28,8 @@ PROMPT_COMMAND="$PROMPT_COMMAND; history -a" # immediate write on enter
 shopt -s checkwinsize
 
 ### misc
+export GREP_COLORS='ms=01;32'
 TERM="xterm-256color"
-GREP_COLOR="32"
 LC_ALL=en_US.UTF-8
 dotfiles=$HOME/dotfiles
 
