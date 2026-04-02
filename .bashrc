@@ -14,11 +14,15 @@ export EDITOR="emacsclient -c"
 export SUDO_EDITOR="emacsclient -c"
 export VISUAL="emacsclient -c"
 
-# history
-HISTCONTROL=ignoreboth
-HISTFILE=~/.bash_history
-HISTSIZE=9999
-shopt -s histappend
+### history
+export HISTIGNORE="ls:cd:exit:pwd:clear" # these commands are not appended to history
+export HISTTIMEFORMAT="%F %T "           # add timestamps
+HISTCONTROL=ignoreboth                   # no duplicates or lines
+HISTSIZE=1000000
+HISTFILESIZE=1000000
+shopt -s histappend                          # append to history
+shopt -s cmdhist                             # multi-line as one entry
+PROMPT_COMMAND="$PROMPT_COMMAND; history -a" # immediate write on enter
 
 # update window size after each line
 shopt -s checkwinsize
