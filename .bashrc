@@ -38,9 +38,8 @@ PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }history -a"
 export PROMPT_DIRTRIM=2
 export PS1="[\h][\w]\$ "
 
-if [[ "$TERM" != "dumb" ]]; then
-    # Append the theme source to the history-save command
-    PROMPT_COMMAND="$PROMPT_COMMAND; [ -f ~/.bash_ps1.sh ] && source ~/.bash_ps1.sh"
+if [[ "$TERM" != "dumb" && -f ~/.bash_ps1.sh ]]; then
+    PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }source ~/.bash_ps1.sh 2>/dev/null"
 fi
 
 # ==============================================================================
