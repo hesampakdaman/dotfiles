@@ -26,11 +26,11 @@ shopt -s lithist      # conserve newlines and formatting
 export HISTSIZE=1000000
 export HISTFILESIZE=1000000
 export HISTCONTROL=ignoreboth
-export HISTIGNORE="ls:cd:exit:pwd:clear"
+export HISTIGNORE="exit:pwd:clear"
 export HISTTIMEFORMAT="%F %T "
 
 # Initialize PROMPT_COMMAND with history sync
-PROMPT_COMMAND="history -a"
+PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }history -a"
 
 # ==============================================================================
 # PROMPT SETTINGS
