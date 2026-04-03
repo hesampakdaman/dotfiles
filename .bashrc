@@ -23,8 +23,8 @@ shopt -s lithist      # conserve newlines and formatting
 # ==============================================================================
 # HISTORY SETTINGS
 # ==============================================================================
-export HISTSIZE=1000000
-export HISTFILESIZE=1000000
+export HISTSIZE=250000
+export HISTFILESIZE=250000
 export HISTCONTROL=ignoreboth
 export HISTIGNORE="exit:pwd:clear"
 export HISTTIMEFORMAT="%F %T "
