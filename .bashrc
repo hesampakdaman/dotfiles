@@ -16,9 +16,9 @@ export GREP_COLORS='ms=01;32'
 [[ $- == *i* ]] && stty -ixon # Disable freeze C-s for interactive shells
 
 # Sane defaults
-# shopt -s checkwinsize  # update window size after each command
 shopt -s histappend   # append to the history file, don't overwrite it
 shopt -s cmdhist      # save multi-line commands as one entry
+shopt -s lithist      # conserve newlines and formatting
 
 # ==============================================================================
 # HISTORY SETTINGS
