@@ -16,8 +16,9 @@ export GREP_COLORS='ms=01;32'
 [[ $- == *i* ]] && stty -ixon # Disable freeze C-s for interactive shells
 
 # Sane defaults
-shopt -s histappend   # append to the history file, don't overwrite it
 shopt -s cmdhist      # save multi-line commands as one entry
+shopt -s globstar     # matches '**' recursively in all sub-dirs (**/*.sh)
+shopt -s histappend   # append to the history file, don't overwrite it
 shopt -s lithist      # conserve newlines and formatting
 
 # ==============================================================================
