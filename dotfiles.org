@@ -1,0 +1,930 @@
+# -*- lexical-binding: t; after-save-hook: org-babel-tangle; before-save-hook: delete-trailing-whitespace; org-babel-pre-tangle-hook: org-babel-execute-buffer; org-confirm-babel-evaluate: nil; -*-
+#+TITLE: dotfiles
+#+AUTHOR: Hesam Pakdaman
+#+STARTUP: overview
+#+PROPERTY: header-args :eval never :mkdirp yes
+#+PROPERTY: header-args:emacs-lisp :eval yes :results silent
+
+* bash
+#+begin_src emacs-lisp
+  (use-system-pkg bash
+    :ensure t)
+#+end_src
+** profile
+#+begin_src bash :tangle ~/.bash_profile
+  [ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"
+  [ -d "$HOME/go/bin" ] && PATH="$HOME/go/bin:$PATH"
+  [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+  export PATH
+
+  if [ -f "$HOME/.bashrc" ]; then
+      . "$HOME/.bashrc"
+  fi
+#+end_src
+** rc
+#+begin_src bash :tangle ~/.bashrc
+  # ==============================================================================
+  # ENVIRONMENT VARIABLES
+  # ==============================================================================
+  export LC_CTYPE=en_US.UTF-8
+  export EDITOR="emacsclient -c"
+  export SUDO_EDITOR="emacsclient -c"
+  export VISUAL="emacsclient -c"
+  export TERM="xterm-256color"
+  export dotfiles="$HOME/dotfiles"
+  export GREP_COLORS='ms=01;32'
+
+  # ==============================================================================
+  # SHELL OPTIONS & BEHAVIOR
+  # ==============================================================================
+  [[ $- == *i* ]] && stty -ixon # Disable freeze C-s for interactive shells
+
+  # Sane defaults
+  shopt -s cmdhist      # save multi-line commands as one entry
+  shopt -s globstar     # matches '**' recursively in all sub-dirs (**/*.sh)
+  shopt -s histappend   # append to the history file, don't overwrite it
+  shopt -s lithist      # conserve newlines and formatting
+
+  # ==============================================================================
+  # HISTORY SETTINGS
+  # ==============================================================================
+  export HISTSIZE=250000
+  export HISTFILESIZE=250000
+  export HISTCONTROL=ignoreboth
+  export HISTIGNORE="exit:pwd:clear"
+  export HISTTIMEFORMAT="%F %T "
+
+  # Initialize PROMPT_COMMAND with history sync
+  PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }history -a"
+
+  # ==============================================================================
+  # PROMPT SETTINGS
+  # ==============================================================================
+  export PROMPT_DIRTRIM=2
+  export PS1="[\h][\w]\$ "
+
+  if [[ "$TERM" != "dumb" && -f ~/.bash_ps1.sh ]]; then
+      PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }source ~/.bash_ps1.sh 2>/dev/null"
+  fi
+
+  # ==============================================================================
+  # ALIASES & COLORS
+  # ==============================================================================
+  if [ -x /usr/bin/dircolors ]; then
+      test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+      alias ls='ls --color=auto'
+      alias grep='grep --color=auto'
+      alias fgrep='fgrep --color=auto'
+      alias egrep='egrep --color=auto'
+  fi
+
+  alias ll='ls -alF'
+  alias la='ls -A'
+  alias l='ls -CF'
+
+  # Load external aliases if they exist
+  [ -f "$HOME/.bash_aliases" ] && source "$HOME/.bash_aliases"
+
+  # ==============================================================================
+  # EXTERNAL TOOLS & COMPLETIONS
+  # ==============================================================================
+
+  # Bash Completion
+  if ! shopt -oq posix; then
+      if [ -f /usr/share/bash-completion/bash_completion ]; then
+          . /usr/share/bash-completion/bash_completion
+      elif [ -f /etc/bash_completion ]; then
+          . /etc/bash_completion
+      fi
+  fi
+
+  # FZF (Key bindings and Completion)
+  if [ -f /usr/share/fzf/key-bindings.bash ]; then
+      source /usr/share/fzf/key-bindings.bash
+      source /usr/share/fzf/completion.bash
+      export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow'
+      export FZF_DEFAULT_OPTS='--height=100% --layout=reverse --border'
+
+      export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+      export FZF_CTRL_T_OPTS="
+        --preview 'bat --color=always --style=numbers {}'
+      "
+  fi
+
+  # zoxide (smart cd)
+  if command -v zoxide >/dev/null 2>&1; then
+      export _ZO_ECHO=1
+      eval "$(zoxide init bash)"
+  fi
+
+  # keychain (ssh agent)
+  if command -v keychain >/dev/null 2>&1 && [ -f ~/.ssh/id_ed25519 ]; then
+      keychain --nogui --quiet ~/.ssh/id_ed25519
+      [[ -f $HOME/.keychain/$(hostname)-sh ]] && source $HOME/.keychain/$(hostname)-sh
+  fi
+#+end_src
+* darkman
+#+begin_src yaml-ts :tangle ~/.config/darkman/config.yaml
+  dbusserver: true
+  portal: true
+#+end_src
+* fd
+#+begin_src emacs-lisp
+  (use-system-pkg fd
+    :ensure t)
+#+end_Src
+** ignore
+#+begin_src conf :tangle ~/.config/fd/ignore
+  # VCS
+  .git
+  .hg
+  .svn
+
+  # Build artifacts
+  zig-cache
+  zig-out
+
+  # Node
+  node_modules
+
+  # Python
+  __pycache__
+  ,*.pyc
+  ,*.pyo
+  ,*.pyd
+  .venv
+  venv
+  .mypy_cache
+  .pytest_cache
+  .ipynb_checkpoints
+
+  # Rust (already mostly covered by target)
+  ,**/*.rs.bk
+
+  # Caches / temp
+  .cache
+  .tmp
+  tmp
+  .direnv
+
+  # Editor / tooling
+  .idea
+  .vscode
+  .emacs.d
+  .lsp
+  .ccls-cache
+
+  # OS noise
+  .DS_Store
+#+end_src
+
+* git
+#+begin_src emacs-lisp
+  (use-system-pkg git
+    :ensure t)
+#+end_src
+
+#+begin_src conf :tangle ~/.gitconfig
+  [user]
+      name = Hesam Pakdaman
+
+  [includeIf "gitdir:~/"]
+      path = ~/.gitconfig-home
+
+  [includeIf "gitdir:~/repos/@h/"]
+      path = ~/.gitconfig-home
+
+  [includeIf "gitdir:~/repos/@w/"]
+      path = ~/.gitconfig-work
+
+  [init]
+  	defaultBranch = main
+
+  # Core & General Settings
+  [core]
+  	excludesfile = ~/.gitignore
+      editor = emacsclient -c
+
+  [help]
+  	autocorrect = prompt
+
+  [grep]
+      lineNumber = true
+      patternType = perl
+
+  # User Interface & Output
+  [column]
+  	ui = auto
+
+  # Branch & Tag Management
+  [branch]
+  	sort = -committerdate
+
+  [tag]
+  	sort = version:refname
+
+  # Commit & Diff Options
+  [diff]
+  	colorMoved = plain
+  	mnemonicPrefix = true
+  	renames = true
+
+  [commit]
+  	verbose = true
+
+  # Integration: Merge, Rebase, Pull
+  [rebase]
+  	autoSquash = true
+  	autoStash = true
+  	updateRefs = true
+
+  [pull]
+  	rebase = true
+
+  # Remote Collaboration
+  [push]
+  	default = simple
+  	autoSetupRemote = true
+  	followTags = true
+
+  [fetch]
+  	prune = true
+  	pruneTags = true
+  	all = true
+
+  [url "ssh://git@github.com/"]
+      insteadOf = https://github.com/
+
+  # Conflict Resolution
+  [rerere]
+  	enabled = true
+  	autoupdate = true
+#+end_src
+* ghostty
+#+begin_src emacs-lisp
+  (use-system-pkg ghostty
+    :ensure t)
+#+end_src
+
+#+begin_src conf :tangle ~/.config/ghostty/config
+  config-file = ?local.conf
+
+  # appearance
+  font-family = JetBrainsMono Nerd Font
+  theme = "Matugen"
+  window-decoration = false
+  window-padding-x = 15
+  window-padding-y = 10,8
+
+  # keybinds
+  keybind = ctrl+enter=unbind
+  keybind = ctrl+comma=unbind
+#+end_src
+* hyprland
+** config
+#+begin_src conf :tangle ~/.config/hypr/hyprland.conf
+  $mainMod = SUPER
+
+  source = ./colors.conf
+  source = ./local.conf
+
+  $browser = zen-browser
+  $editor = emacsclient -c
+  $fileManager = dolphin
+  $menu = rofi -show drun
+  $terminal = ghostty
+
+  exec-once = dbus-update-activation-environment --systemd --all
+  exec-once = emacsclient --eval "(setenv \"WAYLAND_DISPLAY\" \"${WAYLAND_DISPLAY}\")"
+
+  exec-once = awww-daemon
+  exec-once = dropbox
+  exec-once = hypridle
+  exec-once = swayosd-server
+
+  #############################
+  ### ENVIRONMENT VARIABLES ###
+  #############################
+  env = XCURSOR_SIZE,24
+  env = HYPRCURSOR_SIZE,24
+
+  #####################
+  ### LOOK AND FEEL ###
+  #####################
+  general {
+      border_size = 2
+      col.active_border = $primary
+      col.inactive_border = $surface_container_high
+      resize_on_border = true
+      allow_tearing = false
+      layout = dwindle
+  }
+
+  decoration {
+      rounding = 10
+      active_opacity = 0.95
+      fullscreen_opacity = 1.0
+      inactive_opacity = 0.80
+      shadow {
+          enabled = true
+          range = 4
+          render_power = 3
+          color = $shadow
+          color_inactive = $surface
+          offset = 0 0
+          scale = 1.0
+          sharp = false
+      }
+      blur {
+          enabled = true
+          size = 6
+          passes = 1
+          vibrancy = 0.1696
+      }
+  }
+
+  animations {
+      enabled = true
+      bezier = myBezier, 0.05, 0.9, 0.1, 1.05
+      animation = windows, 1, 7, myBezier
+      animation = windowsOut, 1, 7, default, popin 80%
+      animation = border, 1, 10, default
+      animation = borderangle, 1, 8, default
+      animation = fade, 1, 7, default
+      animation = workspaces, 1, 6, default
+  }
+
+  dwindle {
+      pseudotile = true
+      preserve_split = true
+      permanent_direction_override = false
+  }
+
+  master {
+      new_status = master
+  }
+
+  misc {
+      force_default_wallpaper = -1 # Set to 0 or 1 to disable the anime mascot wallpapers
+      disable_hyprland_logo = false # If true disables the random hyprland logo / anime girl background. :(
+  }
+
+  #############
+  ### INPUT ###
+  #############
+  input {
+      kb_layout = us, se
+      kb_variant =
+      kb_model =
+      kb_options = grp:win_space_toggle
+      kb_rules =
+
+      follow_mouse = 0
+
+      sensitivity = 0 # -1.0 - 1.0, 0 means no modification.
+
+      touchpad {
+          natural_scroll = true
+      }
+  }
+
+  cursor {
+      inactive_timeout = 3
+      # do not move cursor when switching windows
+      no_warps = true
+  }
+
+  device {
+      name = epic-mouse-v1
+      sensitivity = -0.5
+  }
+
+
+  ####################
+  ### KEYBINDINGSS ###
+  ####################
+
+  # See https://wiki.hyprland.org/Configuring/Keywords/
+
+
+  # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
+  bind = $mainMod, A, exec, $editor
+  bind = $mainMod, B, exec, GDK_BACKEND=x11 foliate
+  bind = $mainMod, C, centerwindow
+  bind = $mainMod, F, exec, $browser
+  bind = $mainMod, T, exec, $terminal
+  bind = $mainMod, E, exec, emacsclient -c -F '((name . "eshell-popup"))' -e '(eshell)'
+  bind = $mainMod, D, killactive,
+  bind = $mainMod, V, togglefloating,
+  bind = $mainMod, R, exec, $menu
+  bind = $mainMod SHIFT CTRL, P, exec, grim -g "$(slurp)" - | satty --filename -
+
+  bind = $mainMod, P, pseudo, # dwindle
+  bind = $mainMod, O, togglesplit, # dwindle
+
+  # Set split direction for the next window (like Sway's split h/v)
+  bind = $mainMod CTRL, h, layoutmsg, preselect l
+  bind = $mainMod CTRL, j, layoutmsg, preselect d
+  bind = $mainMod CTRL, k, layoutmsg, preselect u
+  bind = $mainMod CTRL, l, layoutmsg, preselect r
+
+  # media keys
+  # l -> do stuff even when locked
+  # e -> repeats when key is held
+  bindl=, XF86AudioMute, exec,swayosd-client --output-volume mute-toggle
+  bindle=, XF86AudioRaiseVolume, exec, swayosd-client --output-volume raise
+  bindle=, XF86AudioLowerVolume, exec, swayosd-client --output-volume lower
+
+  bindle=, XF86MonBrightnessUp, exec, swayosd-client --brightness raise
+  bindle=, XF86MonBrightnessDown, exec, swayosd-client --brightness lower
+  bindle=, XF86Search, exec, launchpad
+
+  bindl=, XF86AudioPlay, exec, playerctl play-pause
+  bindl=, XF86AudioNext, exec, playerctl next
+  bindl=, XF86AudioPrev, exec, playerctl previous
+
+  # Adjust brightness (External via USB-C)
+  bind = SUPER, F7, exec, ~/.local/bin/external-backlight.sh - 10
+  bind = SUPER, F8, exec, ~/.local/bin/external-backlight.sh + 10
+
+  bind = $mainMod SHIFT, Q, exec, systemctl sleep
+  bind = $mainMod SHIFT, E, exec, hyprctl dispatch exit
+  bind = $mainMod SHIFT, W, exec, hyprlock
+
+  # Backup in case emacsclient is not running
+  bind = $mainMod alt, h, movefocus, l
+  bind = $mainMod alt, j, movefocus, d
+  bind = $mainMod alt, k, movefocus, u
+  bind = $mainMod alt, l, movefocus, r
+
+  # Move focus with mainMod + arrow keys
+  bind = $mainMod, h, exec, ~/.config/hypr/emacs-movefocus.sh h
+  bind = $mainMod, j, exec, ~/.config/hypr/emacs-movefocus.sh j
+  bind = $mainMod, k, exec, ~/.config/hypr/emacs-movefocus.sh k
+  bind = $mainMod, l, exec, ~/.config/hypr/emacs-movefocus.sh l
+
+  # Switch workspaces with mainMod + [0-9]
+  bind = $mainMod, 1, workspace, 1
+  bind = $mainMod, 2, workspace, 2
+  bind = $mainMod, 3, workspace, 3
+  bind = $mainMod, 4, workspace, 4
+  bind = $mainMod, 5, workspace, 5
+  bind = $mainMod, 6, workspace, 6
+  bind = $mainMod, 7, workspace, 7
+  bind = $mainMod, 8, workspace, 8
+  bind = $mainMod, 9, workspace, 9
+  bind = $mainMod, 0, workspace, 10
+
+  # Move active window to a workspace with mainMod + SHIFT + [0-9]
+  bind = $mainMod SHIFT, 1, movetoworkspace, 1
+  bind = $mainMod SHIFT, 2, movetoworkspace, 2
+  bind = $mainMod SHIFT, 3, movetoworkspace, 3
+  bind = $mainMod SHIFT, 4, movetoworkspace, 4
+  bind = $mainMod SHIFT, 5, movetoworkspace, 5
+  bind = $mainMod SHIFT, 6, movetoworkspace, 6
+  bind = $mainMod SHIFT, 7, movetoworkspace, 7
+  bind = $mainMod SHIFT, 8, movetoworkspace, 8
+  bind = $mainMod SHIFT, 9, movetoworkspace, 9
+  bind = $mainMod SHIFT, 0, movetoworkspace, 10
+
+  # Example special workspace (scratchpad)
+  # bind = $mainMod, S, togglespecialworkspace, magic
+  # bind = $mainMod SHIFT, S, movetoworkspace, special:magic
+
+  # Scroll through existing workspaces with mainMod + scroll
+  bind = $mainMod, mouse_down, workspace, e+1
+  bind = $mainMod, mouse_up, workspace, e-1
+
+  # Move/resize windows with mainMod + LMB/RMB and dragging
+  bindm = $mainMod, mouse:272, movewindow
+  bindm = $mainMod, mouse:273, resizewindow
+
+
+  ##############################
+  ### WINDOWS AND WORKSPACES ###
+  ##############################
+
+  windowrule = match:class mpv, opacity 1.0 override
+  windowrule = match:class zen, match:title .*YouTube.*, opacity 1.0 override
+  windowrule = match:class zen, match:title .*Netflix.*, opacity 1.0 override
+  windowrulev = suppressevent maximize, class:.* # You'll probably like this.
+
+  windowrule {
+      name = ghostty
+      match:class = com.mitchellh.ghostty
+
+      float = on
+      center = on
+      pin = on
+      size = 1000 500
+  }
+
+  windowrule {
+      name = eshell
+      match:title = eshell-popup
+
+      float = on
+      center = on
+      pin = on
+      size = 1000 500
+  }
+
+  windowrule {
+      name = Waypaper
+      match:class = waypaper
+
+      float = on
+      center = on
+      size =  800 1000
+  }
+
+  render {
+      cm_fs_passthrough = 0
+  }
+#+end_src
+** hyprlock
+#+begin_src conf :tangle ~/.config/hypr/hyprlock.conf
+  background {
+      monitor =
+      path = screenshot
+      color = rgba(25, 20, 20, 1.0)
+      blur_passes = 2
+  }
+
+  label {
+      monitor =
+      #clock
+      text = cmd[update:1000] echo "$TIME"
+      color = rgba(200, 200, 200, 1.0)
+      font_size = 55
+      font_family = JetBrainsMono Nerd Font
+      position = -100, 70
+      halign = right
+      valign = bottom
+      shadow_passes = 5
+      shadow_size = 10
+  }
+
+  input-field {
+      monitor =
+      size = 200, 50
+      outline_thickness = 3
+      dots_size = 0.33 # Scale of input-field height, 0.2 - 0.8
+      dots_spacing = 0.15 # Scale of dots' absolute size, 0.0 - 1.0
+      dots_center = true
+      dots_rounding = -1 # -1 default circle, -2 follow input-field rounding
+      outer_color = rgb(151515)
+      inner_color = rgb(FFFFFF)
+      font_color = rgb(10, 10, 10)
+      fade_on_empty = true
+      fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
+      placeholder_text = <i>Input Password...</i> # Text rendered in the input box when it's empty.
+      hide_input = false
+      rounding = 40 # -1 means complete rounding (circle/oval)
+      check_color = rgb(204, 136, 34)
+      fail_color = rgb(204, 34, 34) # if authentication failed, changes outer_color and fail message color
+      fail_text = <i>$FAIL <b>($ATTEMPTS)</b></i> # can be set to empty
+      fail_transition = 300 # transition time in ms between normal outer_color and fail_color
+      capslock_color = -1
+      numlock_color = -1
+      bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
+      invert_numlock = false # change color if numlock is off
+      swap_font_color = false # see below
+      position = 0, -20
+      halign = center
+      valign = center
+      shadow_passes = 10
+      shadow_size = 20
+      shadow_color = rgb(0,0,0)
+      shadow_boost = 1.6
+  }
+#+end_src
+** hypridle
+#+begin_src conf :tangle ~/.config/hypr/hypridle.conf
+  general {
+      lock_cmd = pidof hyprlock || hyprlock       # avoid starting multiple hyprlock instances.
+      before_sleep_cmd = loginctl lock-session    # lock before suspend.
+      after_sleep_cmd = hyprctl dispatch dpms on && emacsclient -e "(hesam--apply-matugen-by-solar)"
+  }
+
+  listener {
+      timeout = 150                                # 2.5min.
+      on-timeout = brightnessctl -s set 10         # set monitor backlight to minimum, avoid 0 on OLED monitor.
+      on-resume = brightnessctl -r                 # monitor backlight restore.
+  }
+
+  # turn off keyboard backlight, comment out this section if you dont have a keyboard backlight.
+  listener {
+      timeout = 150                                          # 2.5min.
+      on-timeout = brightnessctl -sd rgb:kbd_backlight set 0 # turn off keyboard backlight.
+      on-resume = brightnessctl -rd rgb:kbd_backlight        # turn on keyboard backlight.
+  }
+
+  listener {
+      timeout = 1800
+      on-timeout = loginctl lock-session # lock screen when timeout has passed
+  }
+
+  listener {
+      timeout = 1860
+      on-timeout = hyprctl dispatch dpms off                            # screen off when timeout has passed
+      on-resume = hyprctl dispatch dpms on && brightnessctl -r          # screen on when activity is detected after timeout has fired.
+  }
+
+  listener {
+      timeout = 3600
+      on-timeout = systemctl suspend
+  }
+#+end_src
+** emacs-movefocus
+#+begin_src bash :tangle ~/.config/hypr/emacs-movefocus.sh :tangle-mode (identity #o755)
+  #!/bin/bash
+
+  # Argument should be one of: h j k l
+  key="$1"
+
+  case "$key" in
+    h) dir="left" ;;
+    j) dir="down" ;;
+    k) dir="up" ;;
+    l) dir="right" ;;
+    ,*) exit 1 ;;
+  esac
+
+  emacsclient -e "(hesam/windmove-or-hyprland '$dir)"
+#+end_src
+* matugen
+#+begin_src toml :tangle ~/.config/matugen/config.toml
+  [config]
+  version_check = false
+  caching = false
+
+  [config.wallpaper]
+  set = true
+  command = "awww img {{ image }} --transition-type random --transition-duration 2.0"
+  args = []
+
+  [templates.ashell]
+  input_path = "./ashell.toml"
+  output_path = "~/.config/ashell/config.toml"
+
+  [templates.darkman]
+  input_path = "./darkman"
+  output_path = "./darkman"
+  post_hook = "darkman set {{ mode }}"
+
+  [templates.dircolors]
+  input_path = "./dircolors"
+  output_path = "~/.dircolors"
+  post_hook = "eval $(dircolors ~/.dircolors)"
+
+  [templates.emacs]
+  input_path = "./emacs.el"
+  output_path = "~/.emacs.d/matugen.el"
+  post_hook = "emacsclient -e '(load \"~/.emacs.d/matugen.el\")'"
+
+  [templates.ghostty]
+  input_path = "./ghostty"
+  output_path = "~/.config/ghostty/themes/Matugen"
+  post_hook = "pkill -SIGUSR2 ghostty"
+
+  [templates.hyprland]
+  input_path = "./hyprland-colors.conf"
+  output_path = "~/.config/hypr/colors.conf"
+
+  [templates.mako]
+  input_path = "./mako"
+  output_path = "~/.config/mako/mako-colors"
+  post_hook = "makoctl reload"
+
+  [templates.ps1]
+  input_path = "./bash_ps1.sh"
+  output_path = "~/.bash_ps1.sh"
+  post_hook = "source ~/.bash_ps1.sh"
+
+  [templates.wallpaper_path]
+  input_path = "./wallpaper_path"
+  output_path = "~/.local/state/wallpaper_path"
+#+end_src
+** templates
+*** ashell
+#+begin_src toml :tangle ~/.config/matugen/ashell.toml
+  position = "Bottom"
+
+  [modules]
+  left = [ "Workspaces" ]
+  center = []
+  right = [ "Clock", [ "Settings" ] ]
+
+  [appearance]
+  font_name = "JetBrainsMono Nerd Font"
+  scale_factor = 1.15
+  style = "Islands"
+
+  success_color = "{{ colors.tertiary.default.hex }}"
+  text_color = "{{ colors.on_surface.default.hex }}"
+
+  workspace_colors = [
+    "{{ colors.primary.default.hex }}",
+    "{{ colors.primary.default.hex }}",
+  ]
+
+  [appearance.primary_color]
+  base = "{{ colors.primary.default.hex }}"
+  text = "{{ colors.on_primary.default.hex }}"
+
+  [appearance.danger_color]
+  base = "{{ colors.error.default.hex }}"
+  weak = "{{ colors.error_container.default.hex }}"
+
+  [appearance.background_color]
+  base = "{{ colors.background.default.hex }}"
+  weak = "{{ colors.surface_container.default.hex }}"
+  strong = "{{ colors.surface_container_high.default.hex }}"
+
+  [appearance.secondary_color]
+  base = "{{ colors.secondary.default.hex }}"
+  strong = "{{ colors.secondary_container.default.hex }}"
+
+  [appearance.menu]
+  backdrop = 0.2
+
+  [clock]
+  format = "%a %d %b %R"
+#+end_src
+*** bash PS1
+#+begin_src conf :tangle ~/.config/matugen/bash_ps1.sh
+  PRIMARY_HEX="{{colors.primary.default.hex}}"
+  R=$((16#${PRIMARY_HEX:1:2}))
+  G=$((16#${PRIMARY_HEX:3:2}))
+  B=$((16#${PRIMARY_HEX:5:2}))
+
+  export PS1="\[\e[38;2;${R};${G};${B}m\][\h][\w]\$\[\e[0m\] "
+#+end_src
+*** darkman
+This is empty by intention because =matugen= requires it.
+#+begin_src conf :tangle ~/.config/matugen/darkman
+#+end_src
+*** dircolors
+#+begin_src conf :tangle ~/.config/matugen/dircolors
+  NORMAL 00
+  RESET 0
+
+  DIR 01;38;2;{{colors.primary.default.red}};{{colors.primary.default.green}};{{colors.primary.default.blue}}
+  LINK 00;38;2;{{colors.tertiary_container.default.red}};{{colors.tertiary_container.default.green}};{{colors.tertiary_container.default.blue}}
+  EXEC 01;38;2;{{colors.secondary.default.red}};{{colors.secondary.default.green}};{{colors.secondary.default.blue}}
+  ORPHAN 01;38;2;{{colors.error.default.red}};{{colors.error.default.green}};{{colors.error.default.blue}}
+  FIFO 00;38;2;{{colors.on_surface_variant.default.red}};{{colors.on_surface_variant.default.green}};{{colors.on_surface_variant.default.blue}}
+  SOCK 00;38;2;{{colors.inverse_primary.default.red}};{{colors.inverse_primary.default.green}};{{colors.inverse_primary.default.blue}}
+  BLK 00;38;2;{{colors.outline.default.red}};{{colors.outline.default.green}};{{colors.outline.default.blue}}
+  CHR 00;38;2;{{colors.primary_fixed_dim.default.red}};{{colors.primary_fixed_dim.default.green}};{{colors.primary_fixed_dim.default.blue}}
+#+end_src
+*** emacs theme
+#+begin_src emacs-lisp :tangle ~/.config/matugen/emacs.el :eval never :mkdirp yes
+  ;; -*- lexical-binding: t; -*-
+  (hesam-matugen-pick-ef-theme-by-hsl
+   :primary "{{colors.primary.default.hsl}}"
+   :secondary "{{colors.secondary.default.hsl}}"
+   :tertiary "{{colors.tertiary.default.hsl}}"
+   :surface "{{colors.surface.default.hsl}}"
+   :surface-variant "{{colors.surface_variant.default.hsl}}")
+#+end_src
+*** ghostty
+#+begin_src conf :tangle ~/.config/matugen/ghostty
+  background = {{colors.background.default.hex}}
+  foreground = {{colors.on_surface.default.hex}}
+  cursor-color = {{colors.on_surface.default.hex}}
+  cursor-text = {{colors.on_surface_variant.default.hex}}
+  selection-background = {{colors.secondary_fixed_dim.default.hex}}
+  selection-foreground = {{colors.on_secondary.default.hex}}
+#+end_src
+*** hyprland
+#+begin_src conf :tangle ~/.config/matugen/hyprland-colors.conf
+  $image = {{image}}
+  <* for name, value in colors *>
+  ${{name}} = rgba({{value.default.hex_stripped}}ff)
+  <* endfor *>
+#+end_src
+*** mako
+#+begin_src conf :tangle ~/.config/matugen/mako
+  background-color={{colors.on_primary.default.hex}}
+  text-color={{colors.tertiary.default.hex}}
+  border-color={{colors.tertiary_container.default.hex}}
+  # Per-mode settings
+
+  [mode=do-not-disturb]
+  invisible=1
+  on-notify=none
+
+  [mode=silent]
+  on-notify=none
+
+  [urgency=high]
+  border-color={{colors.error_container.default.hex}}
+#+end_src
+*** wallpaper path
+#+begin_src conf :tangle ~/.config/matugen/wallpaper_path
+  {{ image }}
+#+end_src
+* mpv
+#+begin_src conf :tangle ~/.config/mpv/mpv.conf
+  target-colorspace-hint=no
+#+end_src
+
+#+begin_src conf :tangle ~/.config/mpv/input.conf
+  h seek -1
+  j add volume -1
+  k add volume +1
+  l seek +1
+  Shift+h seek -60
+  Shift+l seek +60
+  s cycle sub
+  S cycle sub down
+#+end_src
+* vim
+#+begin_src emacs-lisp
+  (use-system-pkg vim)
+  (use-system-pkg nvim)
+#+end_src
+
+#+begin_src conf :tangle ~/.vimrc
+  " behaviour {{{1
+
+      filetype plugin indent on
+
+      set autoindent
+      set backspace=indent,eol,start  " backapsce behaviour
+      set encoding=utf8
+      set hidden                      " switch between unsaved buffers
+      set nocompatible                " be iMproved, required
+      set nostartofline               " Scroll to non-blank lines
+      set path+=**                    " :find for files in subdirs
+
+      " search {{{2
+          set hlsearch            " highlights search
+          set ignorecase
+          set incsearch           " search begins without hitting enter
+          set smartcase           " case insensitive if search word is lowercase
+      " }}}
+
+      " ruler and statusline {{{2
+          set laststatus=2            " always show statusline
+          set ruler
+          set rulerformat=%l:%c
+          set showcmd                 " show commands in bottom right corner
+          set showmatch               " show matching brace temporarily
+      " }}}
+
+      " indentation {{{2
+          set autoindent              " indent same as current line
+          set expandtab
+          set shiftwidth=4
+          set softtabstop=4
+      " }}}
+
+      " timeout {{{2
+          " timeout on keycodes, not on mappings
+          set ttimeoutlen=0
+          set timeoutlen=500
+      "}}}
+
+  " }}}
+
+  " netrw settings {{{1
+      let netrw_liststyle = 3
+      let g:netrw_banner = 0
+  " }}}
+
+  " performance {{{1
+      set ttyfast
+      set ttyscroll=3
+  " }}}
+
+  " keybindings {{{1
+  "
+      " scroll {{{2
+          nnoremap <C-e> 5<C-e>
+          nnoremap <C-y> 5<C-y>
+
+      " }}}
+
+      " universal bindings {{{2
+          noremap ; :
+          noremap <C-g> <C-[>
+          noremap <silent><Leader>l :set hls!<CR>
+          noremap Q gqip
+          noremap <Leader>rc :e ~/.vimrc <CR>
+          noremap <silent><Leader>r :set rnu!<CR>
+          noremap <Leader>so :so %<CR>
+      " }}}
+
+  " }}}
+
+  " colors and highlight {{{1
+      syntax on
+      set background=dark
+  " }}}
+
+  " vim: foldmethod=marker
+#+end_src
