@@ -659,9 +659,10 @@
 ** hypridle
 #+begin_src conf :tangle ~/.config/hypr/hypridle.conf
   general {
-      lock_cmd = pidof hyprlock || hyprlock       # avoid starting multiple hyprlock instances.
-      before_sleep_cmd = loginctl lock-session    # lock before suspend.
-      after_sleep_cmd = hyprctl dispatch dpms on && emacsclient -e "(hesam-matugen-apply-by-solar)"
+      lock_cmd = pidof hyprlock || hyprlock # avoid starting multiple hyprlock instances.
+      on_unlock_cmd = emacsclient -e "(hesam-matugen-apply-by-solar)"
+      before_sleep_cmd = loginctl lock-session
+      after_sleep_cmd = hyprctl dispatch dpms on
   }
 
   listener {
