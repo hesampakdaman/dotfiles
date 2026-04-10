@@ -6,25 +6,31 @@
 #+PROPERTY: header-args:emacs-lisp :eval yes :results silent
 
 * ashell
-#+name:ashell-base
-#+begin_src toml
+#+name:ashell-config
+#+begin_src toml :noweb yes
   position = "Bottom"
 
   [modules]
   left = [ "Workspaces" ]
   center = []
-  right = [ "Clock", [ "Settings" ] ]
+  right = [ "Tempo", [ "Settings" ] ]
 
   [appearance]
   font_name = "JetBrainsMono Nerd Font"
   scale_factor = 1.15
   style = "Islands"
 
+  <<ashell-colors>>
+
   [appearance.menu]
   backdrop = 0.2
 
-  [clock]
-  format = "%a %d %b %R"
+  [tempo]
+  clock_format = "%a %d %b %R"
+  weather_location = { City = "Stockholm" }
+  weather_indicator = "Icon"
+
+
 #+end_src
 ** systemd
 #+begin_src conf :tangle ~/.config/systemd/user/ashell.service
@@ -761,10 +767,9 @@
 #+end_src
 ** templates
 *** ashell
-#+begin_src toml :tangle ~/.config/matugen/ashell.toml :noweb yes
-  <<ashell-base>>
-
-  [appearance]
+**** colors
+#+name:ashell-colors
+#+begin_src toml
   success_color = "{{ colors.tertiary.default.hex }}"
   text_color = "{{ colors.on_surface.default.hex }}"
 
@@ -789,6 +794,10 @@
   [appearance.secondary_color]
   base = "{{ colors.secondary.default.hex }}"
   strong = "{{ colors.secondary_container.default.hex }}"
+#+end_src
+**** actual template
+#+begin_src conf :tangle  :tangle ~/.config/matugen/ashell.toml :noweb yes
+  <<ashell-config>>
 #+end_src
 *** bash PS1
 #+begin_src conf :tangle ~/.config/matugen/bash_ps1.sh
