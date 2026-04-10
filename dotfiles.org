@@ -5,6 +5,41 @@
 #+PROPERTY: header-args :eval never :mkdirp yes
 #+PROPERTY: header-args:emacs-lisp :eval yes :results silent
 
+* ashell
+#+name:ashell-base
+#+begin_src toml
+  position = "Bottom"
+
+  [modules]
+  left = [ "Workspaces" ]
+  center = []
+  right = [ "Clock", [ "Settings" ] ]
+
+  [appearance]
+  font_name = "JetBrainsMono Nerd Font"
+  scale_factor = 1.15
+  style = "Islands"
+
+  [appearance.menu]
+  backdrop = 0.2
+
+  [clock]
+  format = "%a %d %b %R"
+#+end_src
+** systemd
+#+begin_src conf :tangle ~/.config/systemd/user/ashell.service
+  [Unit]
+  Description=ashell
+
+  [Service]
+  ExecStart=/usr/bin/ashell
+  Restart=on-failure
+  RestartSec=1
+
+  [Install]
+  WantedBy=default.target
+#+end_src
+
 * bash
 #+begin_src emacs-lisp
   (use-system-pkg bash
@@ -128,6 +163,23 @@
 #+begin_src yaml-ts :tangle ~/.config/darkman/config.yaml
   dbusserver: true
   portal: true
+#+end_src
+** gtk
+#+begin_src conf :tangle ~/.local/share/darkman/gtk.sh
+  #!/bin/sh
+
+  case "$1" in
+    dark)
+      gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+      ;;
+    light)
+      gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
+      ;;
+    ,*)
+      echo "Usage: $0 {dark|light}"
+      exit 1
+      ;;
+  esac
 #+end_src
 * fd
 #+begin_src emacs-lisp
@@ -605,7 +657,7 @@
   general {
       lock_cmd = pidof hyprlock || hyprlock       # avoid starting multiple hyprlock instances.
       before_sleep_cmd = loginctl lock-session    # lock before suspend.
-      after_sleep_cmd = hyprctl dispatch dpms on && emacsclient -e "(hesam--apply-matugen-by-solar)"
+      after_sleep_cmd = hyprctl dispatch dpms on && emacsclient -e "(hesam-matugen-apply-by-solar)"
   }
 
   listener {
@@ -709,19 +761,10 @@
 #+end_src
 ** templates
 *** ashell
-#+begin_src toml :tangle ~/.config/matugen/ashell.toml
-  position = "Bottom"
-
-  [modules]
-  left = [ "Workspaces" ]
-  center = []
-  right = [ "Clock", [ "Settings" ] ]
+#+begin_src toml :tangle ~/.config/matugen/ashell.toml :noweb yes
+  <<ashell-base>>
 
   [appearance]
-  font_name = "JetBrainsMono Nerd Font"
-  scale_factor = 1.15
-  style = "Islands"
-
   success_color = "{{ colors.tertiary.default.hex }}"
   text_color = "{{ colors.on_surface.default.hex }}"
 
@@ -746,12 +789,6 @@
   [appearance.secondary_color]
   base = "{{ colors.secondary.default.hex }}"
   strong = "{{ colors.secondary_container.default.hex }}"
-
-  [appearance.menu]
-  backdrop = 0.2
-
-  [clock]
-  format = "%a %d %b %R"
 #+end_src
 *** bash PS1
 #+begin_src conf :tangle ~/.config/matugen/bash_ps1.sh
@@ -842,89 +879,20 @@ This is empty by intention because =matugen= requires it.
   s cycle sub
   S cycle sub down
 #+end_src
-* vim
-#+begin_src emacs-lisp
-  (use-system-pkg vim)
-  (use-system-pkg nvim)
-#+end_src
+* scripts
+** external backlight
+Control backlight of external monitors with =ddcutil=.
+#+begin_src conf :tangle ~/.local/bin/external-backlight.sh
+  #!/bin/bash
 
-#+begin_src conf :tangle ~/.vimrc
-  " behaviour {{{1
+  # setvcp arguments are + N to increase N or - N to decrease
+  # $* joins all arguments (e.g. + and 10) into a single string
+  ddcutil setvcp 10 $* --noverify
 
-      filetype plugin indent on
+  # Get the new value to show in the OSD
+  # --terse format: VCP 10 C 50 100 (where 50 is current, 100 is max)
+  current=$(ddcutil getvcp 10 --terse | awk '{print $4}')
 
-      set autoindent
-      set backspace=indent,eol,start  " backapsce behaviour
-      set encoding=utf8
-      set hidden                      " switch between unsaved buffers
-      set nocompatible                " be iMproved, required
-      set nostartofline               " Scroll to non-blank lines
-      set path+=**                    " :find for files in subdirs
-
-      " search {{{2
-          set hlsearch            " highlights search
-          set ignorecase
-          set incsearch           " search begins without hitting enter
-          set smartcase           " case insensitive if search word is lowercase
-      " }}}
-
-      " ruler and statusline {{{2
-          set laststatus=2            " always show statusline
-          set ruler
-          set rulerformat=%l:%c
-          set showcmd                 " show commands in bottom right corner
-          set showmatch               " show matching brace temporarily
-      " }}}
-
-      " indentation {{{2
-          set autoindent              " indent same as current line
-          set expandtab
-          set shiftwidth=4
-          set softtabstop=4
-      " }}}
-
-      " timeout {{{2
-          " timeout on keycodes, not on mappings
-          set ttimeoutlen=0
-          set timeoutlen=500
-      "}}}
-
-  " }}}
-
-  " netrw settings {{{1
-      let netrw_liststyle = 3
-      let g:netrw_banner = 0
-  " }}}
-
-  " performance {{{1
-      set ttyfast
-      set ttyscroll=3
-  " }}}
-
-  " keybindings {{{1
-  "
-      " scroll {{{2
-          nnoremap <C-e> 5<C-e>
-          nnoremap <C-y> 5<C-y>
-
-      " }}}
-
-      " universal bindings {{{2
-          noremap ; :
-          noremap <C-g> <C-[>
-          noremap <silent><Leader>l :set hls!<CR>
-          noremap Q gqip
-          noremap <Leader>rc :e ~/.vimrc <CR>
-          noremap <silent><Leader>r :set rnu!<CR>
-          noremap <Leader>so :so %<CR>
-      " }}}
-
-  " }}}
-
-  " colors and highlight {{{1
-      syntax on
-      set background=dark
-  " }}}
-
-  " vim: foldmethod=marker
+  # Trigger SwayOSD to show the bar
+  swayosd-client --brightness "$current"
 #+end_src
