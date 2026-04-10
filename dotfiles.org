@@ -4,7 +4,6 @@
 #+STARTUP: overview
 #+PROPERTY: header-args :eval never :mkdirp yes
 #+PROPERTY: header-args:emacs-lisp :eval yes :results silent
-
 * ashell
 #+name:ashell-config
 #+begin_src toml :noweb yes
