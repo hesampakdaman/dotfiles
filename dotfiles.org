@@ -934,4 +934,5 @@ Control backlight of external monitors with =ddcutil=.
   (system-pkg keychain)
   (system-pkg python)
   (system-pkg zoxide)
+  (system-pkg swayosd-git :exe swayosd-client)
 #+end_src
