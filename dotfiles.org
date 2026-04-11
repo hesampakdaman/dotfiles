@@ -1,10 +1,16 @@
-# -*- lexical-binding: t; after-save-hook: org-babel-tangle; before-save-hook: delete-trailing-whitespace; org-babel-pre-tangle-hook: org-babel-execute-buffer; org-confirm-babel-evaluate: nil; -*-
+# -*- lexical-binding: t; after-save-hook: org-babel-tangle, system-pkg-install-queued; before-save-hook: delete-trailing-whitespace; org-babel-pre-tangle-hook: org-babel-execute-buffer; org-confirm-babel-evaluate: nil; -*-
 #+TITLE: dotfiles
 #+AUTHOR: Hesam Pakdaman
 #+STARTUP: overview
 #+PROPERTY: header-args :eval never :mkdirp yes
 #+PROPERTY: header-args:emacs-lisp :eval yes :results silent
+#+begin_src emacs-lisp
+  (system-pkg-mode t)
+#+end_src
 * ashell
+#+begin_src emacs-lisp
+  (system-pkg ashell)
+#+end_src
 #+name:ashell-config
 #+begin_src toml :noweb yes
   position = "Bottom"
@@ -46,10 +52,6 @@
 #+end_src
 
 * bash
-#+begin_src emacs-lisp
-  (use-system-pkg bash
-    :ensure t)
-#+end_src
 ** profile
 #+begin_src bash :tangle ~/.bash_profile
   [ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"
@@ -165,6 +167,10 @@
   fi
 #+end_src
 * darkman
+#+begin_src emacs-lisp
+  (system-pkg darkman)
+#+end_src
+** config
 #+begin_src yaml-ts :tangle ~/.config/darkman/config.yaml
   dbusserver: true
   portal: true
@@ -188,8 +194,7 @@
 #+end_src
 * fd
 #+begin_src emacs-lisp
-  (use-system-pkg fd
-    :ensure t)
+  (system-pkg fd)
 #+end_Src
 ** ignore
 #+begin_src conf :tangle ~/.config/fd/ignore
@@ -238,8 +243,7 @@
 
 * git
 #+begin_src emacs-lisp
-  (use-system-pkg git
-    :ensure t)
+  (system-pkg git)
 #+end_src
 
 #+begin_src conf :tangle ~/.gitconfig
@@ -320,8 +324,7 @@
 #+end_src
 * ghostty
 #+begin_src emacs-lisp
-  (use-system-pkg ghostty
-    :ensure t)
+  (system-pkg ghostty)
 #+end_src
 
 #+begin_src conf :tangle ~/.config/ghostty/config
@@ -339,6 +342,11 @@
   keybind = ctrl+comma=unbind
 #+end_src
 * hyprland
+#+begin_src emacs-lisp
+  (system-pkg hyprland)
+  (system-pkg hyprlock)
+  (system-pkg hypridle)
+#+end_src
 ** config
 #+begin_src conf :tangle ~/.config/hypr/hyprland.conf
   $mainMod = SUPER
@@ -712,6 +720,10 @@
   emacsclient -e "(hesam/windmove-or-hyprland '$dir)"
 #+end_src
 * matugen
+#+begin_src emacs-lisp
+  (system-pkg matugen)
+#+end_src
+** config
 #+begin_src toml :tangle ~/.config/matugen/config.toml
   [config]
   version_check = false
@@ -873,6 +885,10 @@ This is empty by intention because =matugen= requires it.
   {{ image }}
 #+end_src
 * mpv
+#+begin_src emacs-lisp
+  (system-pkg mpv)
+#+end_src
+** config
 #+begin_src conf :tangle ~/.config/mpv/mpv.conf
   target-colorspace-hint=no
 #+end_src
