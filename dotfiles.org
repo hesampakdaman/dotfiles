@@ -4,6 +4,8 @@
 #+STARTUP: overview
 #+PROPERTY: header-args :eval never :mkdirp yes
 #+PROPERTY: header-args:emacs-lisp :eval yes :results silent
+* Introduction
+This file consists of configurations for different packages on Linux. Each section consists package configuration blocks that is tangled to where the package expects it to be. Additionally, we install the actual package using =system-pkg-mode=.
 #+begin_src emacs-lisp
   (system-pkg-mode t)
 #+end_src
