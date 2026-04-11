@@ -13,6 +13,8 @@ This file consists of configurations for different packages on Linux. Each secti
 #+begin_src emacs-lisp
   (system-pkg ashell)
 #+end_src
+** config
+We use =noweb yes= to insert =<<ashell-colors>==.
 #+name:ashell-config
 #+begin_src toml :noweb yes
   position = "Bottom"
@@ -54,7 +56,7 @@ This file consists of configurations for different packages on Linux. Each secti
 #+end_src
 
 * bash
-** profile
+** bash_profile
 #+begin_src bash :tangle ~/.bash_profile
   [ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"
   [ -d "$HOME/go/bin" ] && PATH="$HOME/go/bin:$PATH"
@@ -66,7 +68,7 @@ This file consists of configurations for different packages on Linux. Each secti
       . "$HOME/.bashrc"
   fi
 #+end_src
-** rc
+** bashrc
 #+begin_src bash :tangle ~/.bashrc
   # ==============================================================================
   # ENVIRONMENT VARIABLES
@@ -248,6 +250,7 @@ This file consists of configurations for different packages on Linux. Each secti
   (system-pkg git)
 #+end_src
 
+** config
 #+begin_src conf :tangle ~/.gitconfig
   [user]
       name = Hesam Pakdaman
@@ -329,6 +332,7 @@ This file consists of configurations for different packages on Linux. Each secti
   (system-pkg ghostty)
 #+end_src
 
+** config
 #+begin_src conf :tangle ~/.config/ghostty/config
   config-file = ?local.conf
 
@@ -349,7 +353,7 @@ This file consists of configurations for different packages on Linux. Each secti
   (system-pkg hyprlock)
   (system-pkg hypridle)
 #+end_src
-** config
+** hyprland
 #+begin_src conf :tangle ~/.config/hypr/hyprland.conf
   $mainMod = SUPER
 
