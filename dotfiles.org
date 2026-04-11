@@ -1,4 +1,4 @@
-# -*- lexical-binding: t; after-save-hook: org-babel-tangle, system-pkg-install-queued; before-save-hook: delete-trailing-whitespace; org-babel-pre-tangle-hook: org-babel-execute-buffer; org-confirm-babel-evaluate: nil; -*-
+# -*- lexical-binding: t; after-save-hook: org-babel-tangle; before-save-hook: delete-trailing-whitespace; org-confirm-babel-evaluate: nil; eval: (add-hook 'org-babel-pre-tangle-hook #'org-babel-execute-buffer nil t); eval: (add-hook 'org-babel-tangle-finished-hook #'system-pkg-install-queued nil t) -*-
 #+TITLE: dotfiles
 #+AUTHOR: Hesam Pakdaman
 #+STARTUP: overview
