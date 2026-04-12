@@ -1,2 +1,0 @@
-* GNU Stow
-Install GNU Stow to link all configuration files =stow .=.
