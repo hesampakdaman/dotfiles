@@ -1,4 +1,3 @@
-# -*- lexical-binding: t; after-save-hook: org-babel-tangle; before-save-hook: delete-trailing-whitespace; org-confirm-babel-evaluate: nil; eval: (add-hook 'org-babel-pre-tangle-hook #'org-babel-execute-buffer nil t); eval: (add-hook 'org-babel-tangle-finished-hook #'system-pkg-install-queued nil t) -*-
 #+TITLE: dotfiles
 #+AUTHOR: Hesam Pakdaman
 #+STARTUP: overview
@@ -6,9 +5,6 @@
 #+PROPERTY: header-args:emacs-lisp :eval yes :results silent
 * Introduction
 This file consists of configurations for different packages on Linux. Each section consists package configuration blocks that is tangled to where the package expects it to be. Additionally, we install the actual package using =system-pkg-mode=.
-#+begin_src emacs-lisp
-  (system-pkg-mode t)
-#+end_src
 * ashell
 #+begin_src emacs-lisp
   (system-pkg ashell)
