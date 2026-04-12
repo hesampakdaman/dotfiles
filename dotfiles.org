@@ -926,15 +926,16 @@ Control backlight of external monitors with =ddcutil=.
   # Trigger SwayOSD to show the bar
   swayosd-client --brightness "$current"
 #+end_src
-* programs
+* packages
 #+begin_src emacs-lisp
+  (system-pkg cliphist)
   (system-pkg fastfetch)
   (system-pkg fzf)
   (system-pkg go)
   (system-pkg keychain)
-  (system-pkg python)
-  (system-pkg zoxide)
-  (system-pkg swayosd-git :exe swayosd-client)
   (system-pkg paru)
-  (system-pkg devtools)
+  (system-pkg python)
+  (system-pkg swayosd-git :exe swayosd-client)
+  (system-pkg wl-clipboard :exe wl-copy)
+  (system-pkg zoxide)
 #+end_src
