@@ -710,9 +710,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   }
 #+end_src
 ** emacs-movefocus
-#+begin_src bash :tangle ~/.config/hypr/emacs-movefocus.sh :tangle-mode (identity #o755)
-  #!/bin/bash
-
+#+begin_src bash :tangle ~/.config/hypr/emacs-movefocus.sh :shebang "#!/bin/bash"
   # Argument should be one of: h j k l
   key="$1"
 
@@ -1183,9 +1181,7 @@ This is empty by intention because =matugen= requires it.
 * scripts
 ** external backlight
 Control backlight of external monitors with =ddcutil=.
-#+begin_src conf :tangle ~/.local/bin/external-backlight.sh
-  #!/bin/bash
-
+#+begin_src conf :tangle ~/.local/bin/external-backlight.sh :shebang "#!/bin/bash"
   # setvcp arguments are + N to increase N or - N to decrease
   # $* joins all arguments (e.g. + and 10) into a single string
   ddcutil setvcp 10 $* --noverify
