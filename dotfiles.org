@@ -779,6 +779,10 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   output_path = "~/.bash_ps1.sh"
   post_hook = "source ~/.bash_ps1.sh"
 
+  [templates.rofi]
+  input_path = "./rofi-colors.rasi"
+  output_path = "~/.config/rofi/colors.rasi"
+
   [templates.wallpaper_path]
   input_path = "./wallpaper_path"
   output_path = "~/.local/state/wallpaper_path"
@@ -887,6 +891,56 @@ This is empty by intention because =matugen= requires it.
   [urgency=high]
   border-color={{colors.error_container.default.hex}}
 #+end_src
+*** rofi
+#+begin_src conf :tangle ~/.config/matugen/rofi-colors.rasi
+  ,* {
+      primary: {{colors.primary.default.hex}};
+      primary-fixed: {{colors.primary_fixed.default.hex}};
+      primary-fixed-dim: {{colors.primary_fixed_dim.default.hex}};
+      on-primary: {{colors.on_primary.default.hex}};
+      on-primary-fixed: {{colors.on_primary_fixed.default.hex}};
+      on-primary-fixed-variant: {{colors.on_primary_fixed_variant.default.hex}};
+      primary-container: {{colors.primary_container.default.hex}};
+      on-primary-container: {{colors.on_primary_container.default.hex}};
+      secondary: {{colors.secondary.default.hex}};
+      secondary-fixed: {{colors.secondary_fixed.default.hex}};
+      secondary-fixed-dim: {{colors.secondary_fixed_dim.default.hex}};
+      on-secondary: {{colors.on_secondary.default.hex}};
+      on-secondary-fixed: {{colors.on_secondary_fixed.default.hex}};
+      on-secondary-fixed-variant: {{colors.on_secondary_fixed_variant.default.hex}};
+      secondary-container: {{colors.secondary_container.default.hex}};
+      on-secondary-container: {{colors.on_secondary_container.default.hex}};
+      tertiary: {{colors.tertiary.default.hex}};
+      tertiary-fixed: {{colors.tertiary_fixed.default.hex}};
+      tertiary-fixed-dim: {{colors.tertiary_fixed_dim.default.hex}};
+      on-tertiary: {{colors.on_tertiary.default.hex}};
+      on-tertiary-fixed: {{colors.on_tertiary_fixed.default.hex}};
+      on-tertiary-fixed-variant: {{colors.on_tertiary_fixed_variant.default.hex}};
+      tertiary-container: {{colors.tertiary_container.default.hex}};
+      on-tertiary-container: {{colors.on_tertiary_container.default.hex}};
+      error: {{colors.error.default.hex}};
+      on-error: {{colors.on_error.default.hex}};
+      error-container: {{colors.error_container.default.hex}};
+      on-error-container: {{colors.on_error_container.default.hex}};
+      surface: {{colors.surface.default.hex}};
+      on-surface: {{colors.on_surface.default.hex}};
+      on-surface-variant: {{colors.on_surface_variant.default.hex}};
+      outline: {{colors.outline.default.hex}};
+      outline-variant: {{colors.outline_variant.default.hex}};
+      shadow: {{colors.shadow.default.hex}};
+      scrim: {{colors.scrim.default.hex}};
+      inverse-surface: {{colors.inverse_surface.default.hex}};
+      inverse-on-surface: {{colors.inverse_on_surface.default.hex}};
+      inverse-primary: {{colors.inverse_primary.default.hex}};
+      surface-dim: {{colors.surface_dim.default.hex}};
+      surface-bright: {{colors.surface_bright.default.hex}};
+      surface-container-lowest: {{colors.surface_container_lowest.default.hex}};
+      surface-container-low: {{colors.surface_container_low.default.hex}};
+      surface-container: {{colors.surface_container.default.hex}};
+      surface-container-high: {{colors.surface_container_high.default.hex}};
+      surface-container-highest: {{colors.surface_container_highest.default.hex}};
+  }
+#+end_src
 *** wallpaper path
 #+begin_src conf :tangle ~/.config/matugen/wallpaper_path
   {{ image }}
@@ -909,6 +963,222 @@ This is empty by intention because =matugen= requires it.
   Shift+l seek +60
   s cycle sub
   S cycle sub down
+#+end_src
+* rofi
+#+begin_src emacs-lisp
+  (system-pkg rofi)
+#+end_src
+#+begin_src conf :tangle ~/.config/rofi/config.rasi
+  @import "colors.rasi"
+
+  configuration {
+      modi: "drun,run,window";
+      show-icons: true;
+      display-drun: "Applications";
+      display-run: "Run";
+      display-window: "Windows";
+      drun-display-format: "{name}";
+      window-format: "{w} · {c}";
+      font: "JetBrainsMono Nerd Font 11";
+  }
+
+  ,* {
+      border-radius:  12px;
+      element-radius: 10px;
+      spacing:        10px;
+  }
+
+  window {
+      location: center;
+      anchor: center;
+      fullscreen: false;
+      width: 720px;
+      x-offset: 0px;
+      y-offset: 0px;
+
+      enabled: true;
+      border: 2px;
+      border-color: @outline-variant;
+      border-radius: @border-radius;
+      cursor: "default";
+
+      background-color: @surface;
+      text-color: @on-surface;
+      padding: 18px;
+  }
+
+  mainbox {
+      enabled: true;
+      spacing: @spacing;
+      background-color: transparent;
+      children: [ "inputbar", "message", "listview", "mode-switcher" ];
+  }
+
+  inputbar {
+      enabled: true;
+      spacing: 10px;
+      padding: 12px;
+      border: 1px;
+      border-color: @outline-variant;
+      border-radius: @border-radius;
+
+      background-color: @surface-container-high;
+      text-color: @on-surface;
+
+      children: [ "prompt", "entry" ];
+  }
+
+  prompt {
+      enabled: true;
+      background-color: transparent;
+      text-color: @on-surface-variant;
+  }
+
+  entry {
+      enabled: true;
+      background-color: transparent;
+      text-color: @on-surface;
+      placeholder: "Search";
+      placeholder-color: @on-surface-variant;
+      cursor: text;
+  }
+
+  message {
+      enabled: true;
+      padding: 10px 12px;
+      border-radius: @element-radius;
+      background-color: @surface-container;
+      text-color: @on-surface;
+  }
+
+  textbox {
+      background-color: transparent;
+      text-color: inherit;
+  }
+
+  listview {
+      enabled: true;
+      border: 1;
+      border-color: @outline-variant;
+      columns: 1;
+      lines: 10;
+      cycle: true;
+      dynamic: true;
+      scrollbar: true;
+      layout: vertical;
+      reverse: false;
+      fixed-height: true;
+
+      background-color: transparent;
+      spacing: 6px;
+      margin: 0px;
+      padding: 0px;
+  }
+
+  scrollbar {
+      handle-width: 6px;
+      border: 0;
+      border-radius: 999px;
+      background-color: @surface-container-low;
+      handle-color: @outline;
+      padding: 0px;
+  }
+
+  element {
+      enabled: true;
+      spacing: 10px;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: @element-radius;
+
+      background-color: transparent;
+      text-color: @on-surface;
+      cursor: pointer;
+  }
+
+  element normal.normal {
+      background-color: transparent;
+      text-color: @on-surface;
+  }
+
+  element normal.urgent {
+      background-color: @error;
+      text-color: @on-error;
+  }
+
+  element normal.active {
+      background-color: @secondary-container;
+      text-color: @on-secondary-container;
+  }
+
+  element selected.normal {
+      background-color: @primary;
+      text-color: @on-primary;
+  }
+
+  element selected.urgent {
+      background-color: @error-container;
+      text-color: @on-error-container;
+  }
+
+  element selected.active {
+      background-color: @secondary-container;
+      text-color: @on-secondary-container;
+  }
+
+  element alternate.normal {
+      background-color: @surface-container-low;
+      text-color: @on-surface;
+  }
+
+  element alternate.active {
+      background-color: @tertiary-container;
+      text-color: @on-tertiary-container;
+  }
+
+  element alternate.urgent {
+      background-color: @error-container;
+      text-color: @on-error-container;
+  }
+
+  element-icon {
+      size: 1.1em;
+      background-color: transparent;
+      text-color: inherit;
+  }
+
+  element-text {
+      background-color: transparent;
+      text-color: inherit;
+      vertical-align: 0.5;
+      highlight: none;
+  }
+
+  mode-switcher {
+      enabled: true;
+      spacing: 8px;
+      background-color: transparent;
+  }
+
+  button {
+      padding: 10px 14px;
+      border: 0px;
+      border-radius: @element-radius;
+      background-color: @surface-container;
+      text-color: @on-surface;
+      cursor: pointer;
+  }
+
+  button selected {
+      background-color: @primary;
+      text-color: @on-primary;
+  }
+
+  separator {
+      orientation: horizontal;
+      thickness: 1px;
+      background-color: @outline-variant;
+  }
 #+end_src
 * scripts
 ** external backlight
