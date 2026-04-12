@@ -38,8 +38,6 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   clock_format = "%a %d %b %R"
   weather_location = { City = "Stockholm" }
   weather_indicator = "Icon"
-
-
 #+end_src
 ** systemd
 #+begin_src conf :tangle ~/.config/systemd/user/ashell.service
@@ -802,18 +800,17 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   base = "{{ colors.primary.default.hex }}"
   text = "{{ colors.on_primary.default.hex }}"
 
-  [appearance.danger_color]
-  base = "{{ colors.error.default.hex }}"
-  weak = "{{ colors.error_container.default.hex }}"
-
   [appearance.background_color]
-  base = "{{ colors.background.default.hex }}"
-  weak = "{{ colors.surface_container.default.hex }}"
-  strong = "{{ colors.surface_container_high.default.hex }}"
+  base = "{{ colors.surface.default.hex }}"
+  text = "{{ colors.on_surface.default.hex }}"
 
   [appearance.secondary_color]
-  base = "{{ colors.secondary.default.hex }}"
-  strong = "{{ colors.secondary_container.default.hex }}"
+  base = "{{ colors.secondary_container.default.hex }}"
+  text = "{{ colors.on_secondary_container.default.hex }}"
+
+  [appearance.danger_color]
+  base = "{{ colors.error_container.default.hex }}"
+  text = "{{ colors.on_error_container.default.hex }}"
 #+end_src
 **** template
 #+begin_src conf :tangle  :tangle ~/.config/matugen/ashell.toml :noweb yes
