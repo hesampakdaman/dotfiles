@@ -373,6 +373,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   exec-once = dropbox
   exec-once = hypridle
   exec-once = swayosd-server
+  exec-once = wl-paste --type text --watch cliphist store
 
   #############################
   ### ENVIRONMENT VARIABLES ###
