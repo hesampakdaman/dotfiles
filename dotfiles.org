@@ -817,7 +817,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   base = "{{ colors.secondary.default.hex }}"
   strong = "{{ colors.secondary_container.default.hex }}"
 #+end_src
-**** actual template
+**** template
 #+begin_src conf :tangle  :tangle ~/.config/matugen/ashell.toml :noweb yes
   <<ashell-config>>
 #+end_src
