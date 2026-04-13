@@ -174,9 +174,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   portal: true
 #+end_src
 ** gtk
-#+begin_src conf :tangle ~/.local/share/darkman/gtk.sh
-  #!/bin/sh
-
+#+begin_src conf :tangle ~/.local/share/darkman/gtk.sh :shebang "#!/bin/sh"
   case "$1" in
     dark)
       gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
