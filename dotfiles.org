@@ -311,9 +311,6 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   	pruneTags = true
   	all = true
 
-  [url "ssh://git@github.com/"]
-      insteadOf = https://github.com/
-
   # Conflict Resolution
   [rerere]
   	enabled = true
