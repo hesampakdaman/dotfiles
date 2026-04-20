@@ -5,6 +5,9 @@
 #+PROPERTY: header-args:emacs-lisp :eval yes :results silent
 * Introduction
 This file consists of configurations for different packages on Linux. Each section consists package configuration blocks that is tangled to where the package expects it to be. Additionally, we install the actual package using =system-pkg-mode=.
+#+begin_src emacs-lisp
+  (require 'xdg)
+#+end_src
 * ashell
 #+begin_src emacs-lisp
   (system-pkg ashell)
@@ -1165,6 +1168,38 @@ This is empty by intention because =matugen= requires it.
       thickness: 1px;
       background-color: @outline-variant;
   }
+#+end_src
+* waypaper
+#+begin_src emacs-lisp
+  (system-pkg waypaper)
+#+end_src
+
+We only want to change the post-command in the config for waypaper and don't really care about any other option. The post-command setting is injected into the config file using =sed=. We also make sure the config exists, and if not create a minimal one.
+#+begin_src emacs-lisp
+  (defun hesam-waypaper--ensure-config-exists ()
+    "Ensure the waypaper config directory and file exist with a header."
+    (let* ((path (expand-file-name "waypaper/config.ini" (xdg-config-home)))
+           (dir (file-name-directory path)))
+      (unless (file-directory-p dir)
+        (make-directory dir t))
+      (unless (file-exists-p path)
+        (write-region "[Settings]\n" nil path))))
+
+  (defun hesam-waypaper--inject-postcommand ()
+    "Surgically update or append the post_command in config.ini."
+    (let* ((path (expand-file-name "waypaper/config.ini" (xdg-config-home)))
+           (cmd "emacsclient --eval \"(hesam-matugen-apply nil \\\"$wallpaper\\\")\"")
+           (line (format "post_command = %s" cmd)))
+      (shell-command
+       (format "grep -q '^post_command =' %s && sed -i 's|^post_command =.*|%s|' %s || echo '%s' >> %s"
+               path
+               (shell-quote-argument line)
+               path
+               line
+               path))))
+
+  (hesam-waypaper--ensure-config-exists)
+  (hesam-waypaper--inject-postcommand)
 #+end_src
 * scripts
 ** external backlight
