@@ -499,20 +499,21 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   local kbLayouts = { "us", "se" }
   local currentKb = 1
 
-  hl.bind(mainMod .. " + ALT + SPACE", function()
+  hl.bind(mainMod .. " + SPACE", function()
       currentKb = (currentKb % #kbLayouts) + 1
       hl.exec_cmd("hyprctl switchxkblayout all " .. (currentKb - 1))
+      hl.exec_cmd("notify-send -t 1000 'Keyboard' '" .. kbLayouts[currentKb] .. "'")
   end)
 
   -- layouts
-  local layouts = { "dwindle", "master", "lua:columns" }
+  local layouts = { "master", "dwindle", "lua:columns" }
   local current = 1
 
-  hl.bind(mainMod .. " + SPACE", function()
+  hl.bind(mainMod .. " + ALT + SPACE", function()
       current = (current % #layouts) + 1
       local layout = layouts[current]
       hl.config({ general = { layout = layout } })
-      hl.exec_cmd("makoctl dismiss && notify-send -t 1000 'Layout' '" .. layout .. "'")
+      hl.exec_cmd("notify-send -r 991 -t 1000 'Layout' '" .. layout .. "'")
   end)
 
   -- Apps
@@ -804,7 +805,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
 
   [templates.mako]
   input_path = "./mako"
-  output_path = "~/.config/mako/mako-colors"
+  output_path = "~/.config/mako/config"
   post_hook = "makoctl reload"
 
   [templates.ps1]
@@ -929,8 +930,20 @@ This is empty by intention because =matugen= requires it.
   background-color={{colors.on_primary.default.hex}}
   text-color={{colors.tertiary.default.hex}}
   border-color={{colors.tertiary_container.default.hex}}
-  # Per-mode settings
+  border-radius=10
+  border-size=2
+  padding=8
+  margin=10
+  width=200
+  font=monospace 10
+  default-timeout=3000
+  max-visible=5
+  sort=-time
 
+  # Icon
+  icon-path=/usr/share/icons/hicolor
+
+  # Per-mode settings
   [mode=do-not-disturb]
   invisible=1
   on-notify=none
@@ -938,8 +951,15 @@ This is empty by intention because =matugen= requires it.
   [mode=silent]
   on-notify=none
 
+  [urgency=low]
+  default-timeout=2000
+
+  [urgency=normal]
+  default-timeout=3000
+
   [urgency=high]
   border-color={{colors.error_container.default.hex}}
+  default-timeout=0
 #+end_src
 *** rofi
 #+begin_src conf :tangle ~/.config/matugen/rofi-colors.rasi
