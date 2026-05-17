@@ -927,15 +927,15 @@ This is empty by intention because =matugen= requires it.
 #+end_src
 *** mako
 #+begin_src conf :tangle ~/.config/matugen/mako
-  background-color={{colors.on_primary.default.hex}}
-  text-color={{colors.tertiary.default.hex}}
-  border-color={{colors.tertiary_container.default.hex}}
+  background-color={{colors.surface_container_high.default.hex}}
+  text-color={{colors.on_surface.default.hex}}
+  border-color={{colors.outline_variant.default.hex}}
   border-radius=10
   border-size=2
   padding=8
   margin=10
   width=200
-  font=monospace 10
+  font=JetBrainsMono Nerd Font 10
   default-timeout=3000
   max-visible=5
   sort=-time
