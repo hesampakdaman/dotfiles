@@ -70,13 +70,9 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   # ==============================================================================
   # ENVIRONMENT VARIABLES
   # ==============================================================================
-  export LC_CTYPE=en_US.UTF-8
-  export EDITOR="emacsclient -c"
-  export SUDO_EDITOR="emacsclient -c"
-  export VISUAL="emacsclient -c"
-  export TERM="xterm-256color"
-  export dotfiles="$HOME/dotfiles"
   export GREP_COLORS='ms=01;32'
+  export LC_CTYPE=en_US.UTF-8
+  export TERM="xterm-256color"
 
   # ==============================================================================
   # SHELL OPTIONS & BEHAVIOR
@@ -387,7 +383,10 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   -------------------------------
   hl.env("XCURSOR_SIZE", "24")
   hl.env("HYPRCURSOR_SIZE", "24")
-
+  hl.env("EDITOR", "emacsclient -c")
+  hl.env("VISUAL", "emacsclient -c")
+  hl.env("SUDO_EDITOR", "emacsclient -c")
+  hl.env("dotfiles", "$HOME/dotfiles")
 
   -----------------------
   ---- LOOK AND FEEL ----
