@@ -21,7 +21,12 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   [modules]
   left = [ "Workspaces" ]
   center = []
-  right = [ "Tempo", [ "Settings" ] ]
+  right = [ "Tempo", [ "Updates", "Settings" ] ]
+
+  [updates]
+  check_cmd = "checkupdates; yay -Qua"
+  update_cmd = 'ghostty -e bash -c "yay; echo Done - Press enter to exit; read" &'
+  interval = 10800
 
   [appearance]
   font_name = "JetBrainsMono Nerd Font"
