@@ -26,7 +26,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   [updates]
   check_cmd = "checkupdates; yay -Qua"
   update_cmd = 'ghostty -e bash -c "yay; echo Done - Press enter to exit; read" &'
-  interval = 10800
+  interval = 172800               # 2 days
 
   [appearance]
   font_name = "JetBrainsMono Nerd Font"
