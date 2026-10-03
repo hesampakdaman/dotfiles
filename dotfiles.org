@@ -533,7 +533,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
 
   -- Apps
   hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(editor))
-  hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("GDK_BACKEND=x11 foliate"))
+  hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("foliate"))
   hl.bind(mainMod .. " + C", hl.dsp.window.center())
   hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(browser))
   hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))
