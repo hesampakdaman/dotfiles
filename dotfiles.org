@@ -3,6 +3,7 @@
 #+STARTUP: overview
 #+PROPERTY: header-args :eval never :mkdirp yes
 #+PROPERTY: header-args:emacs-lisp :eval yes :results silent
+#+PROPERTY: header-args:bash :tangle-mode (identity #o755)
 * Introduction
 This file consists of configurations for different packages on Linux. Each section consists package configuration blocks that is tangled to where the package expects it to be. Additionally, we install the actual package using =system-pkg-mode=.
 #+begin_src emacs-lisp
@@ -22,11 +23,6 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   left = [ "Workspaces" ]
   center = []
   right = [ "Tempo", [ "Updates", "Settings" ] ]
-
-  [updates]
-  check_cmd = "checkupdates; yay -Qua"
-  update_cmd = 'ghostty -e bash -c "yay; echo Done - Press enter to exit; read" &'
-  interval = 604800               # 1 week
 
   [appearance]
   font_name = "JetBrainsMono Nerd Font"
@@ -1298,6 +1294,42 @@ We only want to change the post-command in the config for waypaper and don't rea
   (hesam-waypaper--inject-postcommand)
 #+end_src
 * scripts
+** check update
+This timer needs to be enabled once like so
+#+begin_src shell :eval never
+  systemctl --user enable --now check-updates.timer
+#+end_src
+*** script
+#+begin_src bash :tangle ~/.local/bin/check-updates.sh :shebang "#!/usr/bin/bash"
+  official_count=$(checkupdates 2>/dev/null | wc -l)
+  aur_count=$(yay -Qua 2>/dev/null | wc -l)
+  total_count=$((official_count + aur_count))
+
+  if [ "$total_count" -gt 0 ]; then
+      notify-send -u critical "System Update" "$total_count packages are available to update."
+  fi
+#+end_src
+*** systemd
+#+begin_src conf :tangle ~/.config/systemd/user/check-updates.service
+  [Unit]
+  Description=Check for Arch updates
+
+  [Service]
+  Type=oneshot
+  ExecStart=%h/.local/bin/check-updates.sh
+#+end_src
+*** timer
+#+begin_src conf :tangle ~/.config/systemd/user/check-updates.timer
+  [Unit]
+  Description=Run update check every week
+
+  [Timer]
+  OnCalendar=weekly
+  Persistent=true
+
+  [Install]
+  WantedBy=timers.target
+#+end_src
 ** external backlight
 Control backlight of external monitors with =ddcutil=.
 #+begin_src conf :tangle ~/.local/bin/external-backlight.sh :shebang "#!/bin/bash"
