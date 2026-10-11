@@ -567,22 +567,23 @@ Global excludes, referenced by =core.excludesfile=.
   -- Screenshot
   hl.bind(mainMod .. " + SHIFT + CTRL + P", hl.dsp.exec_cmd('grim -g "$(slurp)" - | satty --filename -'))
 
-  -- Directional binds:
-  --   SUPER + hjkl        focus via emacs (windmove inside emacs, else hyprland)
-  --   SUPER + ALT + hjkl  focus (backup, no emacs integration)
-  --   SUPER + CTRL + hjkl dwindle preselect split direction
-  local directions = {
-      H = { dir = "left",  preselect = "l" },
-      J = { dir = "down",  preselect = "d" },
-      K = { dir = "up",    preselect = "u" },
-      L = { dir = "right", preselect = "r" },
-  }
-  for key, d in pairs(directions) do
-      hl.bind(mainMod .. " + " .. key,
-          hl.dsp.exec_cmd("emacsclient -e \"(hesam/windmove-or-hyprland '" .. d.dir .. ")\""))
-      hl.bind(mainMod .. " + ALT + " .. key, hl.dsp.focus({ direction = d.dir }))
-      hl.bind(mainMod .. " + CTRL + " .. key, hl.dsp.layout("preselect " .. d.preselect))
-  end
+  -- Focus via emacs (windmove inside emacs, else hyprland)
+  hl.bind(mainMod .. " + H", hl.dsp.exec_cmd("emacsclient -e \"(hesam/windmove-or-hyprland 'left)\""))
+  hl.bind(mainMod .. " + J", hl.dsp.exec_cmd("emacsclient -e \"(hesam/windmove-or-hyprland 'down)\""))
+  hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("emacsclient -e \"(hesam/windmove-or-hyprland 'up)\""))
+  hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("emacsclient -e \"(hesam/windmove-or-hyprland 'right)\""))
+
+  -- Focus (backup, no emacs integration)
+  hl.bind(mainMod .. " + ALT + H", hl.dsp.focus({ direction = "left" }))
+  hl.bind(mainMod .. " + ALT + J", hl.dsp.focus({ direction = "down" }))
+  hl.bind(mainMod .. " + ALT + K", hl.dsp.focus({ direction = "up" }))
+  hl.bind(mainMod .. " + ALT + L", hl.dsp.focus({ direction = "right" }))
+
+  -- Dwindle preselect split direction
+  hl.bind(mainMod .. " + CTRL + H", hl.dsp.layout("preselect l"))
+  hl.bind(mainMod .. " + CTRL + J", hl.dsp.layout("preselect d"))
+  hl.bind(mainMod .. " + CTRL + K", hl.dsp.layout("preselect u"))
+  hl.bind(mainMod .. " + CTRL + L", hl.dsp.layout("preselect r"))
 
   -- Media keys (locked): { key, command, repeating }
   local mediaKeys = {
