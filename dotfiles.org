@@ -43,6 +43,8 @@ We use =noweb yes= to insert =<<ashell-colors>==.
 #+begin_src conf :tangle ~/.config/systemd/user/ashell.service
   [Unit]
   Description=ashell
+  PartOf=graphical-session.target
+  After=graphical-session.target
 
   [Service]
   ExecStart=/usr/bin/ashell
@@ -50,7 +52,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   RestartSec=1
 
   [Install]
-  WantedBy=default.target
+  WantedBy=graphical-session.target
 #+end_src
 
 * bash
@@ -73,7 +75,6 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   # ==============================================================================
   export GREP_COLORS='ms=01;32'
   export LC_CTYPE=en_US.UTF-8
-  export TERM="xterm-256color"
 
   # ==============================================================================
   # SHELL OPTIONS & BEHAVIOR
@@ -185,7 +186,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   portal: true
 #+end_src
 ** gtk
-#+begin_src conf :tangle ~/.local/share/darkman/gtk.sh :shebang "#!/bin/sh"
+#+begin_src sh :tangle ~/.local/share/darkman/gtk.sh :shebang "#!/bin/sh"
   case "$1" in
     dark)
       gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
@@ -202,7 +203,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
 * fd
 #+begin_src emacs-lisp
   (system-pkg fd)
-#+end_Src
+#+end_src
 ** ignore
 #+begin_src conf :tangle ~/.config/fd/ignore
   # VCS
@@ -349,7 +350,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
 #+end_src
 * hyprland
 #+begin_src emacs-lisp
-  (system-pkg hyprland)
+  (system-pkg hyprland :exe Hyprland)
   (system-pkg hyprlock)
   (system-pkg hypridle)
 #+end_src
@@ -369,7 +370,6 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   ---- AUTOSTART ----
   -------------------
   hl.on("hyprland.start", function()
-      hl.exec_cmd("dbus-update-activation-environment --systemd --all")
       hl.exec_cmd('emacsclient --eval "(setenv \\"WAYLAND_DISPLAY\\" \\"' ..
           (os.getenv("WAYLAND_DISPLAY") or "") .. '\\")"')
       hl.exec_cmd("awww-daemon")
@@ -798,7 +798,6 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   [templates.dircolors]
   input_path = "./dircolors"
   output_path = "~/.dircolors"
-  post_hook = "eval $(dircolors ~/.dircolors)"
 
   [templates.emacs]
   input_path = "./emacs.el"
@@ -822,7 +821,6 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   [templates.ps1]
   input_path = "./bash_ps1.sh"
   output_path = "~/.bash_ps1.sh"
-  post_hook = "source ~/.bash_ps1.sh"
 
   [templates.rofi]
   input_path = "./rofi-colors.rasi"
@@ -862,7 +860,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   text = "{{ colors.on_error_container.default.hex }}"
 #+end_src
 **** template
-#+begin_src conf :tangle  :tangle ~/.config/matugen/ashell.toml :noweb yes
+#+begin_src conf :tangle ~/.config/matugen/ashell.toml :noweb yes
   <<ashell-config>>
 #+end_src
 *** bash PS1
@@ -1332,7 +1330,7 @@ This timer needs to be enabled once like so
 #+end_src
 ** external backlight
 Control backlight of external monitors with =ddcutil=.
-#+begin_src conf :tangle ~/.local/bin/external-backlight.sh :shebang "#!/bin/bash"
+#+begin_src bash :tangle ~/.local/bin/external-backlight.sh :shebang "#!/bin/bash"
   # setvcp arguments are + N to increase N or - N to decrease
   # $* joins all arguments (e.g. + and 10) into a single string
   ddcutil setvcp 10 $* --noverify
@@ -1346,13 +1344,23 @@ Control backlight of external monitors with =ddcutil=.
 #+end_src
 * packages
 #+begin_src emacs-lisp
+  (system-pkg awww)
+  (system-pkg bat)
+  (system-pkg brightnessctl)
   (system-pkg cliphist)
+  (system-pkg ddcutil)
   (system-pkg fastfetch)
   (system-pkg fzf)
   (system-pkg go)
+  (system-pkg grim)
   (system-pkg keychain)
-  (system-pkg paru)
+  (system-pkg libnotify :exe notify-send)
+  (system-pkg mako)
+  (system-pkg pacman-contrib :exe checkupdates)
+  (system-pkg playerctl)
   (system-pkg python)
+  (system-pkg satty)
+  (system-pkg slurp)
   (system-pkg swayosd-git :exe swayosd-client)
   (system-pkg wl-clipboard :exe wl-copy)
   (system-pkg zoxide)
