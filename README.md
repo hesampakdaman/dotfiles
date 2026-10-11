@@ -35,5 +35,13 @@ These files are read if present and are not tracked:
 - `~/.config/ghostty/local.conf`
 - `~/.gitconfig-home` / `~/.gitconfig-work` (via `includeIf`)
 
+## Laptop sleep
+hypridle suspends with `systemctl suspend-then-hibernate` and falls back to plain suspend where hibernate isn't set up. To hibernate after 30 minutes of sleep, check that `systemctl hibernate` works (swap at least as large as RAM, `resume=` on the kernel command line), then add the drop-ins below. They live in `/etc`, so they aren't tangled.
+```bash
+$ sudo mkdir -p /etc/systemd/sleep.conf.d /etc/systemd/logind.conf.d
+$ printf '[Sleep]\nHibernateDelaySec=30min\n' | sudo tee /etc/systemd/sleep.conf.d/hibernate.conf
+$ printf '[Login]\nHandleLidSwitch=suspend-then-hibernate\n' | sudo tee /etc/systemd/logind.conf.d/lid.conf
+```
+
 ## Removing a block
 Tangling never deletes files. When a block is removed, delete its old target in `$HOME` by hand.

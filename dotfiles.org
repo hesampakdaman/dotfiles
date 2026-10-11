@@ -807,7 +807,7 @@ Global excludes, referenced by =core.excludesfile=.
 
   listener {
       timeout = 3600
-      on-timeout = systemctl suspend
+      on-timeout = systemctl suspend-then-hibernate || systemctl suspend # plain suspend where hibernate isn't set up.
   }
 #+end_src
 * matugen
