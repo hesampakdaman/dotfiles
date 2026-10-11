@@ -535,14 +535,11 @@ Global excludes, referenced by =core.excludesfile=.
 
   local mainMod = "SUPER"
 
-  local kbLayouts = { "us", "se" }
-  local currentKb = 1
-
-  hl.bind(mainMod .. " + SPACE", function()
-      currentKb = (currentKb % #kbLayouts) + 1
-      hl.exec_cmd("hyprctl switchxkblayout all " .. (currentKb - 1))
-      hl.exec_cmd("notify-send -t 1000 'Keyboard' '" .. kbLayouts[currentKb] .. "'")
-  end)
+  -- Cycle keyboard layouts; the notification reads the active keymap back
+  -- from Hyprland so it can't drift out of sync
+  hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(
+      "hyprctl switchxkblayout all next && notify-send -t 1000 Keyboard " ..
+      "\"$(hyprctl devices -j | jq -r '.keyboards[] | select(.main) | .active_keymap')\""))
 
   -- layouts
   local layouts = { "master", "dwindle", "lua:columns" }
@@ -570,25 +567,38 @@ Global excludes, referenced by =core.excludesfile=.
   -- Screenshot
   hl.bind(mainMod .. " + SHIFT + CTRL + P", hl.dsp.exec_cmd('grim -g "$(slurp)" - | satty --filename -'))
 
-  -- Dwindle preselect split direction
-  hl.bind(mainMod .. " + CTRL + H", hl.dsp.layout("preselect l"))
-  hl.bind(mainMod .. " + CTRL + J", hl.dsp.layout("preselect d"))
-  hl.bind(mainMod .. " + CTRL + K", hl.dsp.layout("preselect u"))
-  hl.bind(mainMod .. " + CTRL + L", hl.dsp.layout("preselect r"))
+  -- Directional binds:
+  --   SUPER + hjkl        focus via emacs (windmove inside emacs, else hyprland)
+  --   SUPER + ALT + hjkl  focus (backup, no emacs integration)
+  --   SUPER + CTRL + hjkl dwindle preselect split direction
+  local directions = {
+      H = { dir = "left",  preselect = "l" },
+      J = { dir = "down",  preselect = "d" },
+      K = { dir = "up",    preselect = "u" },
+      L = { dir = "right", preselect = "r" },
+  }
+  for key, d in pairs(directions) do
+      hl.bind(mainMod .. " + " .. key,
+          hl.dsp.exec_cmd("emacsclient -e \"(hesam/windmove-or-hyprland '" .. d.dir .. ")\""))
+      hl.bind(mainMod .. " + ALT + " .. key, hl.dsp.focus({ direction = d.dir }))
+      hl.bind(mainMod .. " + CTRL + " .. key, hl.dsp.layout("preselect " .. d.preselect))
+  end
 
-  -- Media keys (locked)
-  hl.bind("XF86AudioMute", hl.dsp.exec_cmd("swayosd-client --output-volume mute-toggle"), { locked = true })
-  hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("swayosd-client --output-volume raise"),
-      { locked = true, repeating = true })
-  hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("swayosd-client --output-volume lower"),
-      { locked = true, repeating = true })
-  hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("swayosd-client --brightness raise"), { locked = true, repeating = true })
-  hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("swayosd-client --brightness lower"),
-      { locked = true, repeating = true })
-  hl.bind("XF86Search", hl.dsp.exec_cmd("launchpad"), { locked = true, repeating = true })
-  hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-  hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
-  hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
+  -- Media keys (locked): { key, command, repeating }
+  local mediaKeys = {
+      { "XF86AudioMute",         "swayosd-client --output-volume mute-toggle" },
+      { "XF86AudioRaiseVolume",  "swayosd-client --output-volume raise", true },
+      { "XF86AudioLowerVolume",  "swayosd-client --output-volume lower", true },
+      { "XF86MonBrightnessUp",   "swayosd-client --brightness raise",    true },
+      { "XF86MonBrightnessDown", "swayosd-client --brightness lower",    true },
+      { "XF86Search",            "launchpad",                            true },
+      { "XF86AudioPlay",         "playerctl play-pause" },
+      { "XF86AudioNext",         "playerctl next" },
+      { "XF86AudioPrev",         "playerctl previous" },
+  }
+  for _, k in ipairs(mediaKeys) do
+      hl.bind(k[1], hl.dsp.exec_cmd(k[2]), { locked = true, repeating = k[3] })
+  end
 
   -- External display brightness
   hl.bind(mainMod .. " + F7", hl.dsp.exec_cmd("~/.local/bin/external-backlight.sh - 10"))
@@ -598,18 +608,6 @@ Global excludes, referenced by =core.excludesfile=.
   hl.bind(mainMod .. " + SHIFT + Q", hl.dsp.exec_cmd("systemctl sleep"))
   hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exit())
   hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("hyprlock"))
-
-  -- Focus (backup, no emacs integration)
-  hl.bind(mainMod .. " + ALT + H", hl.dsp.focus({ direction = "left" }))
-  hl.bind(mainMod .. " + ALT + J", hl.dsp.focus({ direction = "down" }))
-  hl.bind(mainMod .. " + ALT + K", hl.dsp.focus({ direction = "up" }))
-  hl.bind(mainMod .. " + ALT + L", hl.dsp.focus({ direction = "right" }))
-
-  -- Focus via emacs-movefocus.sh
-  hl.bind(mainMod .. " + H", hl.dsp.exec_cmd("~/.config/hypr/emacs-movefocus.sh h"))
-  hl.bind(mainMod .. " + J", hl.dsp.exec_cmd("~/.config/hypr/emacs-movefocus.sh j"))
-  hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("~/.config/hypr/emacs-movefocus.sh k"))
-  hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("~/.config/hypr/emacs-movefocus.sh l"))
 
   -- Switch / move to workspaces
   for i = 1, 9 do
@@ -640,14 +638,8 @@ Global excludes, referenced by =core.excludesfile=.
   })
 
   hl.window_rule({
-      name    = "zen-youtube-opaque",
-      match   = { class = "zen", title = ".*YouTube.*" },
-      opacity = "1.0 override"
-  })
-
-  hl.window_rule({
-      name    = "zen-netflix-opaque",
-      match   = { class = "zen", title = ".*Netflix.*" },
+      name    = "zen-video-opaque",
+      match   = { class = "zen", title = ".*(YouTube|Netflix).*" },
       opacity = "1.0 override"
   })
 
@@ -659,25 +651,19 @@ Global excludes, referenced by =core.excludesfile=.
       suppress_event = "maximize",
   })
 
-  -- Ghostty floating terminal
-  hl.window_rule({
-      name   = "ghostty",
-      match  = { class = "com.mitchellh.ghostty" },
-      float  = true,
-      center = true,
-      pin    = true,
-      size   = { 1000, 500 },
-  })
-
-  -- Emacs eshell popup
-  hl.window_rule({
-      name   = "eshell",
-      match  = { title = "eshell-popup" },
-      float  = true,
-      center = true,
-      pin    = true,
-      size   = { 1000, 500 },
-  })
+  -- Floating, pinned terminal popups (ghostty and emacs eshell)
+  local function popup(name, match)
+      hl.window_rule({
+          name   = name,
+          match  = match,
+          float  = true,
+          center = true,
+          pin    = true,
+          size   = { 1000, 500 },
+      })
+  end
+  popup("ghostty", { class = "com.mitchellh.ghostty" })
+  popup("eshell", { title = "eshell-popup" })
 
   -- Waypaper
   hl.window_rule({
@@ -783,21 +769,6 @@ Global excludes, referenced by =core.excludesfile=.
       timeout = 3600
       on-timeout = systemctl suspend
   }
-#+end_src
-** emacs-movefocus
-#+begin_src bash :tangle ~/.config/hypr/emacs-movefocus.sh :shebang "#!/bin/bash"
-  # Argument should be one of: h j k l
-  key="$1"
-
-  case "$key" in
-    h) dir="left" ;;
-    j) dir="down" ;;
-    k) dir="up" ;;
-    l) dir="right" ;;
-    ,*) exit 1 ;;
-  esac
-
-  emacsclient -e "(hesam/windmove-or-hyprland '$dir)"
 #+end_src
 * matugen
 #+begin_src emacs-lisp
@@ -1378,6 +1349,7 @@ Control backlight of external monitors with =ddcutil=.
   (system-pkg fzf)
   (system-pkg go)
   (system-pkg grim)
+  (system-pkg jq)
   (system-pkg keychain)
   (system-pkg libnotify :exe notify-send)
   (system-pkg mako)
