@@ -773,12 +773,13 @@ Global excludes, referenced by =core.excludesfile=.
   }
 #+end_src
 ** hypridle
+On battery the screen locks after 5 minutes and the machine suspends after 10. On AC it locks after 30 minutes and never suspends. =on-battery.sh= (see [[*on battery][on battery]]) decides which timers act.
 #+begin_src conf :tangle ~/.config/hypr/hypridle.conf
   general {
       lock_cmd = pidof hyprlock || hyprlock # avoid starting multiple hyprlock instances.
       on_unlock_cmd = emacsclient -e "(hesam-matugen-apply-by-solar)"
       before_sleep_cmd = loginctl lock-session
-      after_sleep_cmd = hyprctl dispatch dpms on
+      after_sleep_cmd = hyprctl dispatch 'hl.dsp.dpms({action = "on"})'
   }
 
   listener {
@@ -794,20 +795,33 @@ Global excludes, referenced by =core.excludesfile=.
       on-resume = brightnessctl -rd rgb:kbd_backlight        # turn on keyboard backlight.
   }
 
+  # On battery: lock, screen off, then suspend.
+  listener {
+      timeout = 300
+      on-timeout = ~/.local/bin/on-battery.sh && loginctl lock-session
+  }
+
+  listener {
+      timeout = 330
+      on-timeout = ~/.local/bin/on-battery.sh && hyprctl dispatch 'hl.dsp.dpms({action = "off"})'
+      on-resume = hyprctl dispatch 'hl.dsp.dpms({action = "on"})' && brightnessctl -r
+  }
+
+  listener {
+      timeout = 600
+      on-timeout = ~/.local/bin/on-battery.sh && (systemctl suspend-then-hibernate || systemctl suspend) # plain suspend where hibernate isn't set up.
+  }
+
+  # On AC: lock and screen off, never suspend.
   listener {
       timeout = 1800
-      on-timeout = loginctl lock-session # lock screen when timeout has passed
+      on-timeout = loginctl lock-session
   }
 
   listener {
       timeout = 1860
-      on-timeout = hyprctl dispatch dpms off                            # screen off when timeout has passed
-      on-resume = hyprctl dispatch dpms on && brightnessctl -r          # screen on when activity is detected after timeout has fired.
-  }
-
-  listener {
-      timeout = 3600
-      on-timeout = systemctl suspend-then-hibernate || systemctl suspend # plain suspend where hibernate isn't set up.
+      on-timeout = hyprctl dispatch 'hl.dsp.dpms({action = "off"})'
+      on-resume = hyprctl dispatch 'hl.dsp.dpms({action = "on"})' && brightnessctl -r
   }
 #+end_src
 * matugen
@@ -1363,6 +1377,19 @@ This timer needs to be enabled once like so
 
   [Install]
   WantedBy=timers.target
+#+end_src
+** on battery
+Succeeds when a system battery is present and no charger is connected. Desktops count as on AC. Peripheral batteries (mice, headsets) report =scope= =Device= and are skipped.
+#+begin_src bash :tangle ~/.local/bin/on-battery.sh :shebang "#!/bin/sh"
+  battery=no
+  for s in /sys/class/power_supply/*; do
+      [ "$(cat "$s/scope" 2>/dev/null)" = Device ] && continue
+      case $(cat "$s/type") in
+          Mains|USB) [ "$(cat "$s/online" 2>/dev/null)" = 1 ] && exit 1 ;;
+          Battery) battery=yes ;;
+      esac
+  done
+  [ "$battery" = yes ]
 #+end_src
 ** external backlight
 Control backlight of external monitors with =ddcutil=.
