@@ -184,8 +184,14 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   fi
 
   # keychain (ssh agent)
+  # keychain itself takes ~300ms, which every shell (and Emacs's
+  # exec-path-from-shell) pays. Reuse the agent from its env file and only
+  # run keychain when the agent is gone or has no keys loaded.
   if command -v keychain >/dev/null 2>&1 && [ -f ~/.ssh/id_ed25519 ]; then
-      eval "$(keychain --eval --nogui --quiet ~/.ssh/id_ed25519)"
+      [ -f ~/.keychain/"$HOSTNAME"-sh ] && . ~/.keychain/"$HOSTNAME"-sh
+      if ! ssh-add -l >/dev/null 2>&1; then
+          eval "$(keychain --eval --nogui --quiet ~/.ssh/id_ed25519)"
+      fi
   fi
 
   if [[ "$INSIDE_EMACS" = 'ghostel' ]]; then
