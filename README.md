@@ -10,10 +10,17 @@ which generates the actual configuration files in `$HOME`. The normal workflow i
 
 Batch tangling only writes files. Packages are installed on save from Emacs, where `.dir-locals.el` enables `system-pkg-mode` (defined in `~/.emacs.d/init.org`), evaluates the `system-pkg` declarations and installs anything missing with `yay`.
 
-## One-time setup
-```bash
-$ systemctl --user enable --now ashell.service check-updates.timer
-```
+## New machine
+1. Install `git`, `emacs` and `yay` (yay is built by hand from the AUR the first time).
+2. Clone the Emacs config to `~/.emacs.d`. It defines `system-pkg` and the `hesam-matugen-*` functions that hypridle, waypaper and matugen call.
+3. Clone this repo to `~/dotfiles`, open `dotfiles.org` in Emacs and save. This tangles every file, installs missing packages and adds waypaper's `post_command`.
+4. Optionally create `~/.config/hypr/machine.lua` for monitors and workspaces (see [Machine-local overrides](#machine-local-overrides)).
+5. Generate the colour files once with `matugen image <wallpaper>`. Until then Hyprland uses fallback colours, and ghostty and rofi report a missing theme or `colors.rasi`.
+6. Enable the user units:
+   ```bash
+   $ systemctl --user enable --now ashell.service check-updates.timer
+   ```
+7. Log in to Hyprland.
 
 ## Generated files
 Some configs are written by `matugen` from templates in `~/.config/matugen/`, not by tangling. Run `matugen` after changing them:
