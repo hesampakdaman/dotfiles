@@ -73,8 +73,18 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   export VISUAL="$EDITOR"
   export SUDO_EDITOR="$EDITOR"
 
-  [ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"
-  [ -d "$HOME/go/bin" ] && PATH="$HOME/go/bin:$PATH"
+  # Prepend DIR to PATH if it exists and isn't already there; the session
+  # (uwsm) may already have imported PATH from an earlier login shell
+  path_prepend() {
+      [ -d "$1" ] || return
+      case ":$PATH:" in
+          *":$1:"*) ;;
+          *) PATH="$1:$PATH" ;;
+      esac
+  }
+  path_prepend "$HOME/.local/bin"
+  path_prepend "$HOME/go/bin"
+  unset -f path_prepend
   [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
   export PATH
