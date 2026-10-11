@@ -197,10 +197,17 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   # keychain itself takes ~300ms, which every shell (and Emacs's
   # exec-path-from-shell) pays. Reuse the agent from its env file and only
   # run keychain when the agent is gone or has no keys loaded.
+  # Only ask for the passphrase in interactive shells: the display manager
+  # runs a login shell with no terminal, and keychain 3 would block session
+  # startup waiting for Enter.
   if command -v keychain >/dev/null 2>&1 && [ -f ~/.ssh/id_ed25519 ]; then
       [ -f ~/.keychain/"$HOSTNAME"-sh ] && . ~/.keychain/"$HOSTNAME"-sh
       if ! ssh-add -l >/dev/null 2>&1; then
-          eval "$(keychain --eval --nogui --quiet ~/.ssh/id_ed25519)"
+          if [[ $- == *i* ]]; then
+              eval "$(keychain --eval --nogui --quiet ~/.ssh/id_ed25519)"
+          else
+              eval "$(keychain --eval --nogui --quiet --noask)"
+          fi
       fi
   fi
 
