@@ -946,12 +946,7 @@ This is empty by intention because =matugen= requires it.
 *** emacs theme
 #+begin_src emacs-lisp :tangle ~/.config/matugen/emacs.el :eval never :mkdirp yes
   ;; -*- lexical-binding: t; -*-
-  (hesam-matugen-pick-ef-theme-by-hsl
-   :primary "{{colors.primary.default.hsl}}"
-   :secondary "{{colors.secondary.default.hsl}}"
-   :tertiary "{{colors.tertiary.default.hsl}}"
-   :surface "{{colors.surface.default.hsl}}"
-   :surface-variant "{{colors.surface_variant.default.hsl}}")
+  (hesam-matugen-pick-theme "{{colors.source_color.default.hex}}" '{{mode}})
 #+end_src
 *** ghostty
 #+begin_src conf :tangle ~/.config/matugen/ghostty
