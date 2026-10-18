@@ -38,7 +38,6 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   [appearance]
   font_name = "<<font>>"
   scale_factor = 1.15
-  style = "Islands"
 
   <<ashell-colors>>
 
@@ -834,6 +833,12 @@ On battery the screen locks after 5 minutes and the machine suspends after 10. O
   version_check = false
   caching = false
 
+  # Material You has no success or warning colours. matugen shifts these
+  # towards the wallpaper's hue and picks a readable tone for each mode.
+  [config.custom_colors]
+  green = "#3fae4a"
+  yellow = "#e0af68"
+
   [config.wallpaper]
   set = true
   command = "awww img {{ image }} --transition-type random --transition-duration 2.0"
@@ -888,7 +893,8 @@ On battery the screen locks after 5 minutes and the machine suspends after 10. O
 **** colors
 #+name:ashell-colors
 #+begin_src toml
-  success_color = "{{ colors.tertiary.default.hex }}"
+  success_color = "{{ colors.green.default.hex }}"
+  warning_color = "{{ colors.yellow.default.hex }}"
   text_color = "{{ colors.on_surface.default.hex }}"
 
   workspace_colors = [
@@ -904,13 +910,9 @@ On battery the screen locks after 5 minutes and the machine suspends after 10. O
   base = "{{ colors.surface.default.hex }}"
   text = "{{ colors.on_surface.default.hex }}"
 
-  [appearance.secondary_color]
-  base = "{{ colors.secondary_container.default.hex }}"
-  text = "{{ colors.on_secondary_container.default.hex }}"
-
   [appearance.danger_color]
-  base = "{{ colors.error_container.default.hex }}"
-  text = "{{ colors.on_error_container.default.hex }}"
+  base = "{{ colors.error.default.hex }}"
+  text = "{{ colors.on_error.default.hex }}"
 #+end_src
 **** template
 #+begin_src conf :tangle ~/.config/matugen/ashell.toml :noweb yes
