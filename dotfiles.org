@@ -862,6 +862,10 @@ On battery the screen locks after 5 minutes and the machine suspends after 10. O
   output_path = "~/.emacs.d/matugen.el"
   post_hook = "emacsclient -e '(load \"~/.emacs.d/matugen.el\")'"
 
+  [templates.foliate]
+  input_path = "./foliate.json"
+  output_path = "~/.config/com.github.johnfactotum.Foliate/themes/matugen.json"
+
   [templates.ghostty]
   input_path = "./ghostty"
   output_path = "~/.config/ghostty/themes/Matugen"
@@ -949,6 +953,26 @@ This is empty by intention because =matugen= requires it.
 #+begin_src emacs-lisp :tangle ~/.config/matugen/emacs.el :eval never :mkdirp yes
   ;; -*- lexical-binding: t; -*-
   (hesam-matugen-pick-theme "{{colors.primary.default.hex}}" '{{mode}})
+#+end_src
+*** foliate
+A reader theme for Foliate, with both light and dark variants so it
+follows the system light/dark switch. Pick "Matugen" once in Foliate's
+theme menu. Foliate reads theme files only at startup, so a new
+wallpaper's colours appear after restarting it.
+#+begin_src json :tangle ~/.config/matugen/foliate.json
+  {
+    "label": "Matugen",
+    "light": {
+      "fg": "{{colors.on_surface.light.hex}}",
+      "bg": "{{colors.surface.light.hex}}",
+      "link": "{{colors.primary.light.hex}}"
+    },
+    "dark": {
+      "fg": "{{colors.on_surface.dark.hex}}",
+      "bg": "{{colors.surface.dark.hex}}",
+      "link": "{{colors.primary.dark.hex}}"
+    }
+  }
 #+end_src
 *** ghostty
 #+begin_src conf :tangle ~/.config/matugen/ghostty
