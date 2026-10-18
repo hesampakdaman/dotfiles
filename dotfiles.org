@@ -717,6 +717,10 @@ Global excludes, referenced by =core.excludesfile=.
 #+end_src
 ** hyprlock
 #+begin_src conf :tangle ~/.config/hypr/hyprlock.conf :noweb yes
+  general {
+      grace = 10 # unlock without password on input within 10s of locking
+  }
+
   background {
       monitor =
       path = screenshot
@@ -772,7 +776,7 @@ Global excludes, referenced by =core.excludesfile=.
   }
 #+end_src
 ** hypridle
-On battery the screen locks after 5 minutes and the machine suspends after 10. On AC it locks after 30 minutes and never suspends. =on-battery.sh= (see [[*on battery][on battery]]) decides which timers act.
+On battery the screen locks after 10 minutes and the machine suspends after 15. On AC it locks after 30 minutes and never suspends. =on-battery.sh= (see [[*on battery][on battery]]) decides which timers act.
 #+begin_src conf :tangle ~/.config/hypr/hypridle.conf
   general {
       lock_cmd = pidof hyprlock || hyprlock # avoid starting multiple hyprlock instances.
@@ -796,18 +800,18 @@ On battery the screen locks after 5 minutes and the machine suspends after 10. O
 
   # On battery: lock, screen off, then suspend.
   listener {
-      timeout = 300
+      timeout = 600
       on-timeout = ~/.local/bin/on-battery.sh && loginctl lock-session
   }
 
   listener {
-      timeout = 330
+      timeout = 630
       on-timeout = ~/.local/bin/on-battery.sh && hyprctl dispatch 'hl.dsp.dpms({action = "off"})'
       on-resume = hyprctl dispatch 'hl.dsp.dpms({action = "on"})' && brightnessctl -r
   }
 
   listener {
-      timeout = 600
+      timeout = 900
       on-timeout = ~/.local/bin/on-battery.sh && (systemctl suspend-then-hibernate || systemctl suspend) # plain suspend where hibernate isn't set up.
   }
 
