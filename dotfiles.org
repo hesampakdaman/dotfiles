@@ -37,7 +37,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
 
   [appearance]
   font_name = "<<font>>"
-  scale_factor = 1.15
+  scale_factor = 1.25
 
   <<ashell-colors>>
 
