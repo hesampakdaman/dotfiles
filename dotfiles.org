@@ -1385,7 +1385,7 @@ This timer needs to be enabled once like so
   done
 
   if [ "$status" -ne 0 ] && [ "$status" -ne 2 ]; then
-      notify-send -u critical "System Update" "Update check failed. See systemctl --user status check-updates."
+      notify-send -u critical -i /usr/share/pixmaps/archlinux-logo.svg "System Update" "Update check failed. See systemctl --user status check-updates."
       exit 1
   fi
 
@@ -1394,7 +1394,7 @@ This timer needs to be enabled once like so
   total_count=$((official_count + aur_count))
 
   if [ "$total_count" -gt 0 ]; then
-      notify-send -u critical "System Update" "$total_count packages are available to update."
+      notify-send -u critical -i /usr/share/pixmaps/archlinux-logo.svg "System Update" "$total_count packages are available to update."
   fi
 #+end_src
 *** systemd
