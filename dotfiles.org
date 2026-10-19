@@ -1030,6 +1030,7 @@ wallpaper's colours appear after restarting it.
 
   # Icon
   icon-path=/usr/share/icons/hicolor
+  max-icon-size=32
 
   # Per-mode settings
   [mode=do-not-disturb]
