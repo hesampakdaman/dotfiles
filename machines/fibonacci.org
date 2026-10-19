@@ -1,0 +1,80 @@
+#+TITLE: fibonacci
+#+PROPERTY: header-args :eval never :mkdirp yes
+#+PROPERTY: header-args:lua :tangle (if (equal (system-name) "fibonacci") "~/.config/hypr/machine.lua" "no")
+* Introduction
+Machine-local overrides for =fibonacci=. The shared config in =dotfiles.org= loads these files if present. Blocks only tangle when the host name is =fibonacci=, so saving this file on another machine writes nothing.
+* hyprland
+Monitors, workspaces, gaps and input, loaded by =optional("machine")= in =hyprland.lua=.
+#+begin_src lua
+  local mainMod = "SUPER"
+
+  --------------------
+  ---- MONITORS ----
+  --------------------
+  -- Scales are the DPI setting for every app (Emacs/pgtk included): aim
+  -- for ~95-120 effective PPI and don't scale fonts per app on top.
+  --   eDP-1  2560x1600@60 (165Hz not needed; saves battery), 340mm wide, ~191 PPI -> 1.6 -> ~119 PPI (1600x1000 logical)
+  --   DP-3   Dell P3221D 2560x1440, 31.5",  ~93 PPI -> 1   -> ~93 PPI
+  -- A scale must divide the resolution into whole logical pixels
+  -- (2560/1.6 = 1600, 1600/1.6 = 1000).
+
+  -- Toggle internal display (lid or keybind)
+  local lidToggle = function()
+      local f = io.open("/proc/acpi/button/lid/LID0/state", "r")
+      if not f then return end
+      local state = f:read("*a")
+      f:close()
+      if state:find("closed") then
+          hl.monitor({ output = "eDP-1", disabled = true })
+      else
+          hl.monitor({ output = "eDP-1", disabled = false, mode = "2560x1600@60", scale = 1.33334 })
+      end
+  end
+
+  lidToggle()
+
+  hl.monitor({
+      output = "DP-3", mode = "preferred", position = "auto-right", scale = 1,
+  })
+
+  hl.bind(mainMod .. " + X", lidToggle)
+  hl.bind("switch:Lid Switch", lidToggle, { locked = true })
+
+  --------------------
+  ---- WORKSPACES ----
+  --------------------
+  for i = 1, 9 do
+      hl.workspace_rule({
+          workspace = tostring(i),
+          monitor = "DP-3",
+      })
+  end
+
+  -- Massive gaps for your built-in display (eDP-1)
+  hl.workspace_rule({
+      workspace = "0",
+      monitor = "eDP-1",
+  })
+
+  ---------------------
+  ---- OVERRIDES ----
+  ---------------------
+  hl.config({
+      general = {
+          gaps_in  = 5,
+          gaps_out = 10,
+      },
+
+      input = {
+          repeat_rate  = 25,
+          repeat_delay = 300,
+      },
+  })
+
+  -- Send Emacs to a scratchpad and resize it there
+  hl.bind(mainMod .. " + SHIFT + C", function()
+      hl.dispatch(hl.dsp.window.float())
+      hl.dispatch(hl.dsp.window.resize({ x = 900, y = 1170 }))
+      hl.dispatch(hl.dsp.window.center())
+  end)
+#+end_src
