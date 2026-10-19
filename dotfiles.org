@@ -37,7 +37,7 @@ We use =noweb yes= to insert =<<ashell-colors>==.
 
   [appearance]
   font_name = "<<font>>"
-  scale_factor = 1.15
+  scale_factor = 1.25
 
   <<ashell-colors>>
 
@@ -389,6 +389,7 @@ Global excludes, referenced by =core.excludesfile=.
 
   # appearance
   font-family = <<font>>
+  font-size = 14
   theme = "Matugen"
   window-decoration = false
   window-padding-x = 15
