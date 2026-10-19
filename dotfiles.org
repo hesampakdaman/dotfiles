@@ -389,6 +389,7 @@ Global excludes, referenced by =core.excludesfile=.
 
   # appearance
   font-family = <<font>>
+  font-size = 14
   theme = "Matugen"
   window-decoration = false
   window-padding-x = 15
