@@ -24,9 +24,8 @@ Values shared by several configs, inserted with noweb (=<<font>>=, =<<editor>>=)
 #+begin_src emacs-lisp
   (system-pkg ashell
     :setup
-    (((eq 0 (call-process "systemctl" nil nil nil
-                          "--user" "is-enabled" "--quiet" "ashell.service"))
-      "systemctl --user enable --now ashell.service")))
+    ((:unless (system-pkg-unit-enabled-p "ashell.service")
+      :run "systemctl --user enable --now ashell.service")))
 #+end_src
 ** config
 We use =noweb yes= to insert =<<ashell-colors>==.
@@ -1114,14 +1113,14 @@ Colours for the [[https://github.com/uiriansan/SilentSDDM][SilentSDDM]] login sc
 #+begin_src emacs-lisp
   (system-pkg sddm-silent-theme
     :setup
-    (((file-directory-p "/var/lib/greeter-theme")
-      "sudo install -d -o $USER -g $USER -m 755 /var/lib/greeter-theme")
-     ((file-symlink-p "/usr/share/sddm/themes/silent/configs/default.conf.user")
-      "sudo ln -s /var/lib/greeter-theme/default.conf.user /usr/share/sddm/themes/silent/configs/default.conf.user")
-     ((file-symlink-p "/usr/share/sddm/themes/silent/backgrounds/matugen.png")
-      "sudo ln -s /var/lib/greeter-theme/wallpaper /usr/share/sddm/themes/silent/backgrounds/matugen.png")
-     ((file-exists-p "/etc/sddm.conf.d/20-theme.conf")
-      "printf '[Theme]\\nCurrent=silent\\n' | sudo tee /etc/sddm.conf.d/20-theme.conf >/dev/null")))
+    ((:unless (file-directory-p "/var/lib/greeter-theme")
+      :run "sudo install -d -o $USER -g $USER -m 755 /var/lib/greeter-theme")
+     (:unless (file-symlink-p "/usr/share/sddm/themes/silent/configs/default.conf.user")
+      :run "sudo ln -s /var/lib/greeter-theme/default.conf.user /usr/share/sddm/themes/silent/configs/default.conf.user")
+     (:unless (file-symlink-p "/usr/share/sddm/themes/silent/backgrounds/matugen.png")
+      :run "sudo ln -s /var/lib/greeter-theme/wallpaper /usr/share/sddm/themes/silent/backgrounds/matugen.png")
+     (:unless (file-exists-p "/etc/sddm.conf.d/20-theme.conf")
+      :run "printf '[Theme]\\nCurrent=silent\\n' | sudo tee /etc/sddm.conf.d/20-theme.conf >/dev/null")))
 #+end_src
 #+begin_src conf :tangle ~/.config/matugen/sddm-silent.conf
   # SilentSDDM colour overrides. SDDM layers this over configs/default.conf,
@@ -1492,9 +1491,8 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
   (system-pkg pacman-contrib
     :exe checkupdates
     :setup
-    (((eq 0 (call-process "systemctl" nil nil nil
-                          "--user" "is-enabled" "--quiet" "check-updates.timer"))
-      "systemctl --user enable --now check-updates.timer")))
+    ((:unless (system-pkg-unit-enabled-p "check-updates.timer")
+      :run "systemctl --user enable --now check-updates.timer")))
 #+end_src
 *** script
 #+begin_src bash :tangle ~/.local/bin/check-updates.sh :shebang "#!/usr/bin/bash"
