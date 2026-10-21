@@ -51,6 +51,11 @@ We use =noweb yes= to insert =<<ashell-colors>==.
   clock_format = "%a %d %b %R"
   weather_location = { City = "Stockholm" }
   weather_indicator = "Icon"
+
+  [settings]
+  # The default `loginctl kill-user` also kills sddm-helper, so SDDM never
+  # restarts the greeter and the screen stays black.
+  logout_cmd = "uwsm stop"
 #+end_src
 ** systemd
 #+begin_src conf :tangle ~/.config/systemd/user/ashell.service
