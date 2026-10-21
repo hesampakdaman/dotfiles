@@ -27,6 +27,7 @@ Some configs are written by `matugen` from templates in `~/.config/matugen/`, no
 - `~/.config/ashell/config.toml`
 - `~/.config/hypr/colors.lua`, `~/.config/ghostty/themes/Matugen`, `~/.config/rofi/colors.rasi`, `~/.config/mako/config`
 - `~/.bash_ps1.sh`, `~/.dircolors`, `~/.emacs.d/matugen.el`
+- `/var/lib/greeter-theme/default.conf.user` (SDDM login screen; needs the one-time setup in the `sddm` template section)
 
 ## Machine-local overrides
 These files are read if present:
