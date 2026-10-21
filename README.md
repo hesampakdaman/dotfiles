@@ -13,21 +13,17 @@ Batch tangling only writes files. Packages are installed on save from Emacs, whe
 ## New machine
 1. Install `git`, `emacs` and `yay` (yay is built by hand from the AUR the first time).
 2. Clone the Emacs config to `~/.emacs.d`. It defines `system-pkg` and the `hesam-matugen-*` functions that hypridle, waypaper and matugen call.
-3. Clone this repo to `~/dotfiles`, open `dotfiles.org` in Emacs and save. This tangles every file, installs missing packages and adds waypaper's `post_command`.
+3. Clone this repo to `~/dotfiles`, open `dotfiles.org` in Emacs and save. This tangles every file, installs missing packages, runs their missing setup steps (`:setup`, e.g. enabling user units and the SDDM theme links; you'll be asked for your sudo password) and adds waypaper's `post_command`.
 4. Optionally add machine-local overrides, such as monitors and workspaces (see [Machine-local overrides](#machine-local-overrides)).
 5. Generate the colour files once with `matugen image <wallpaper>`. Until then Hyprland uses fallback colours, and ghostty and rofi report a missing theme or `colors.rasi`.
-6. Enable the user units:
-   ```bash
-   $ systemctl --user enable --now ashell.service check-updates.timer
-   ```
-7. Log in to Hyprland.
+6. Log in to Hyprland.
 
 ## Generated files
 Some configs are written by `matugen` from templates in `~/.config/matugen/`, not by tangling. Run `matugen` after changing them:
 - `~/.config/ashell/config.toml`
 - `~/.config/hypr/colors.lua`, `~/.config/ghostty/themes/Matugen`, `~/.config/rofi/colors.rasi`, `~/.config/mako/config`
 - `~/.bash_ps1.sh`, `~/.dircolors`, `~/.emacs.d/matugen.el`
-- `/var/lib/greeter-theme/default.conf.user` (SDDM login screen; needs the one-time setup in the `sddm` template section)
+- `/var/lib/greeter-theme/default.conf.user` (SDDM login screen)
 
 ## Machine-local overrides
 These files are read if present:
