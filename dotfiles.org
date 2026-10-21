@@ -22,7 +22,11 @@ Values shared by several configs, inserted with noweb (=<<font>>=, =<<editor>>=)
 #+end_src
 * ashell
 #+begin_src emacs-lisp
-  (system-pkg ashell)
+  (system-pkg ashell
+    :setup
+    (((eq 0 (call-process "systemctl" nil nil nil
+                          "--user" "is-enabled" "--quiet" "ashell.service"))
+      "systemctl --user enable --now ashell.service")))
 #+end_src
 ** config
 We use =noweb yes= to insert =<<ashell-colors>==.
@@ -1106,15 +1110,19 @@ wallpaper's colours appear after restarting it.
   }
 #+end_src
 *** sddm
-Colours for the [[https://github.com/uiriansan/SilentSDDM][SilentSDDM]] login screen. The greeter runs as the =sddm= user and cannot read =$HOME=, so matugen writes to a directory we own outside it, and the theme reads it through symlinks. SDDM layers =<ConfigFile>.user= over the theme's own config, and Silent looks up backgrounds in its =backgrounds/= directory, hence the two links. One-time setup:
-#+begin_src sh
-  sudo install -d -o $USER -g $USER -m 755 /var/lib/greeter-theme
-  T=/usr/share/sddm/themes/silent
-  sudo ln -s /var/lib/greeter-theme/default.conf.user $T/configs/default.conf.user
-  sudo ln -s /var/lib/greeter-theme/wallpaper $T/backgrounds/matugen.png
-  printf '[Theme]\nCurrent=silent\n' | sudo tee /etc/sddm.conf.d/20-theme.conf
+Colours for the [[https://github.com/uiriansan/SilentSDDM][SilentSDDM]] login screen. The greeter runs as the =sddm= user and cannot read =$HOME=, so matugen writes to a directory we own outside it, and the theme reads it through symlinks. SDDM layers =<ConfigFile>.user= over the theme's own config, and Silent looks up backgrounds in its =backgrounds/= directory, hence the two links. =20-theme.conf= sorts after EndeavourOS's =10-endeavouros.conf=, which selects =eos-breeze=.
+#+begin_src emacs-lisp
+  (system-pkg sddm-silent-theme
+    :setup
+    (((file-directory-p "/var/lib/greeter-theme")
+      "sudo install -d -o $USER -g $USER -m 755 /var/lib/greeter-theme")
+     ((file-symlink-p "/usr/share/sddm/themes/silent/configs/default.conf.user")
+      "sudo ln -s /var/lib/greeter-theme/default.conf.user /usr/share/sddm/themes/silent/configs/default.conf.user")
+     ((file-symlink-p "/usr/share/sddm/themes/silent/backgrounds/matugen.png")
+      "sudo ln -s /var/lib/greeter-theme/wallpaper /usr/share/sddm/themes/silent/backgrounds/matugen.png")
+     ((file-exists-p "/etc/sddm.conf.d/20-theme.conf")
+      "printf '[Theme]\\nCurrent=silent\\n' | sudo tee /etc/sddm.conf.d/20-theme.conf >/dev/null")))
 #+end_src
-=20-theme.conf= sorts after EndeavourOS's =10-endeavouros.conf=, which selects =eos-breeze=.
 #+begin_src conf :tangle ~/.config/matugen/sddm-silent.conf
   # SilentSDDM colour overrides. SDDM layers this over configs/default.conf,
   # so only colours and the background live here; layout stays the theme's.
@@ -1479,9 +1487,14 @@ We only want to set =post_command= in waypaper's config and leave the rest (whic
 #+end_src
 * scripts
 ** check update
-This timer needs to be enabled once like so
-#+begin_src shell :eval never
-  systemctl --user enable --now check-updates.timer
+The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
+#+begin_src emacs-lisp
+  (system-pkg pacman-contrib
+    :exe checkupdates
+    :setup
+    (((eq 0 (call-process "systemctl" nil nil nil
+                          "--user" "is-enabled" "--quiet" "check-updates.timer"))
+      "systemctl --user enable --now check-updates.timer")))
 #+end_src
 *** script
 #+begin_src bash :tangle ~/.local/bin/check-updates.sh :shebang "#!/usr/bin/bash"
@@ -1570,11 +1583,9 @@ Control backlight of external monitors with =ddcutil=.
   (system-pkg keychain)
   (system-pkg libnotify :exe notify-send)
   (system-pkg mako)
-  (system-pkg pacman-contrib :exe checkupdates)
   (system-pkg playerctl)
   (system-pkg python)
   (system-pkg satty)
-  (system-pkg sddm-silent-theme)
   (system-pkg slurp)
   (system-pkg swayosd-git :exe swayosd-client)
   (system-pkg wl-clipboard :exe wl-copy)
