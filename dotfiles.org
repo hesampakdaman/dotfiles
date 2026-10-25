@@ -1518,6 +1518,8 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
 #+end_src
 *** script
 #+begin_src bash :tangle ~/.local/bin/check-updates.sh :shebang "#!/usr/bin/bash" :noweb yes
+  icon=/usr/share/pixmaps/archlinux-logo.svg
+
   # checkupdates exits 0 with updates, 2 without and anything else on
   # failure (e.g. no network right after resume), so retry a few times.
   for attempt in 1 2 3 4; do
@@ -1528,7 +1530,7 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
   done
 
   if [ "$status" -ne 0 ] && [ "$status" -ne 2 ]; then
-      notify-send -u critical "System Update" "Update check failed. See systemctl --user status check-updates."
+      notify-send -u critical -i "$icon" "System Update" "Update check failed. See systemctl --user status check-updates."
       exit 1
   fi
 
@@ -1539,7 +1541,7 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
   if [ "$total_count" -gt 0 ]; then
       # Clicking the notification invokes its default action. Launch the
       # terminal through systemd-run so it outlives this oneshot service.
-      action=$(notify-send -u critical --wait -A "default=Update now" \
+      action=$(notify-send -u critical -i "$icon" --wait -A "default=Update now" \
           "System Update" "$total_count packages are available to update. Click to update.")
       if [ "$action" = "default" ]; then
           systemd-run --user --collect --quiet <<terminal>> --title="System Update" \
