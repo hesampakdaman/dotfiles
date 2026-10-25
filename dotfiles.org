@@ -10,7 +10,7 @@ This file consists of configurations for different packages on Linux. Each secti
   (require 'xdg)
 #+end_src
 ** variables
-Values shared by several configs, inserted with noweb (=<<font>>=, =<<editor>>=). Blocks that use them need =:noweb yes=.
+Values shared by several configs, inserted with noweb (=<<font>>=, =<<editor>>=, =<<terminal>>=). Blocks that use them need =:noweb yes=.
 #+name: font
 #+begin_src conf
   JetBrainsMono Nerd Font
@@ -19,6 +19,11 @@ Values shared by several configs, inserted with noweb (=<<font>>=, =<<editor>>=)
 #+name: editor
 #+begin_src conf
   emacsclient -c
+#+end_src
+
+#+name: terminal
+#+begin_src conf
+  ghostty
 #+end_src
 * ashell
 #+begin_src emacs-lisp
@@ -439,7 +444,7 @@ Global excludes, referenced by =core.excludesfile=.
   local browser  = "zen-browser"
   local editor   = "<<editor>>"
   local menu     = "rofi -show drun"
-  local terminal = "ghostty"
+  local terminal = "<<terminal>>"
 
   -------------------
   ---- AUTOSTART ----
@@ -1512,7 +1517,7 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
       :run "systemctl --user enable --now check-updates.timer")))
 #+end_src
 *** script
-#+begin_src bash :tangle ~/.local/bin/check-updates.sh :shebang "#!/usr/bin/bash"
+#+begin_src bash :tangle ~/.local/bin/check-updates.sh :shebang "#!/usr/bin/bash" :noweb yes
   # checkupdates exits 0 with updates, 2 without and anything else on
   # failure (e.g. no network right after resume), so retry a few times.
   for attempt in 1 2 3 4; do
@@ -1537,7 +1542,7 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
       action=$(notify-send -u critical --wait -A "default=Update now" \
           "System Update" "$total_count packages are available to update. Click to update.")
       if [ "$action" = "default" ]; then
-          systemd-run --user --collect --quiet alacritty --title "System Update" \
+          systemd-run --user --collect --quiet <<terminal>> --title="System Update" \
               -e bash -c 'yay -Syu; read -rsn1 -p "Press any key to close."'
       fi
   fi
