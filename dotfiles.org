@@ -1546,7 +1546,7 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
       # up until then. Launch the terminal through systemd-run so it
       # outlives this oneshot service.
       action=$(notify-send -u normal -t 0 -i "$icon" --wait -A "default=Update now" \
-          "System Update" "$total_count $noun. Click to install.")
+          "System Update" "$total_count pending $noun. Click to install.")
       if [ "$action" = "default" ]; then
           systemd-run --user --collect --quiet <<terminal>> --title="System Update" \
               -e bash -c 'yay -Syu; read -rsn1 -p "Press any key to close."'
