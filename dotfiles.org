@@ -1530,7 +1530,7 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
   done
 
   if [ "$status" -ne 0 ] && [ "$status" -ne 2 ]; then
-      notify-send -u critical -i "$icon" "System Update" "Update check failed. See systemctl --user status check-updates."
+      notify-send -u critical -i "$icon" "System Update" "Update check failed. See its logs."
       exit 1
   fi
 
@@ -1539,10 +1539,13 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
   total_count=$((official_count + aur_count))
 
   if [ "$total_count" -gt 0 ]; then
+      # mako's narrow width fits about three short lines of body text.
+      noun=updates
+      [ "$total_count" -eq 1 ] && noun=update
       # Clicking the notification invokes its default action. Launch the
       # terminal through systemd-run so it outlives this oneshot service.
       action=$(notify-send -u critical -i "$icon" --wait -A "default=Update now" \
-          "System Update" "$total_count packages are available to update. Click to update.")
+          "System Update" "$total_count $noun. Click to install.")
       if [ "$action" = "default" ]; then
           systemd-run --user --collect --quiet <<terminal>> --title="System Update" \
               -e bash -c 'yay -Syu; read -rsn1 -p "Press any key to close."'
