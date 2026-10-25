@@ -1542,9 +1542,10 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
       # mako's narrow width fits about three short lines of body text.
       noun=updates
       [ "$total_count" -eq 1 ] && noun=update
-      # Clicking the notification invokes its default action. Launch the
-      # terminal through systemd-run so it outlives this oneshot service.
-      action=$(notify-send -u critical -i "$icon" --wait -A "default=Update now" \
+      # Clicking the notification invokes its default action; -t 0 keeps it
+      # up until then. Launch the terminal through systemd-run so it
+      # outlives this oneshot service.
+      action=$(notify-send -u normal -t 0 -i "$icon" --wait -A "default=Update now" \
           "System Update" "$total_count $noun. Click to install.")
       if [ "$action" = "default" ]; then
           systemd-run --user --collect --quiet <<terminal>> --title="System Update" \
