@@ -1532,7 +1532,14 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
   total_count=$((official_count + aur_count))
 
   if [ "$total_count" -gt 0 ]; then
-      notify-send -u critical "System Update" "$total_count packages are available to update."
+      # Clicking the notification invokes its default action. Launch the
+      # terminal through systemd-run so it outlives this oneshot service.
+      action=$(notify-send -u critical --wait -A "default=Update now" \
+          "System Update" "$total_count packages are available to update. Click to update.")
+      if [ "$action" = "default" ]; then
+          systemd-run --user --collect --quiet alacritty --title "System Update" \
+              -e bash -c 'yay -Syu; read -rsn1 -p "Press any key to close."'
+      fi
   fi
 #+end_src
 *** systemd
