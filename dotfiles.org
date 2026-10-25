@@ -615,10 +615,10 @@ Global excludes, referenced by =core.excludesfile=.
   hl.bind(mainMod .. " + SHIFT + CTRL + P", hl.dsp.exec_cmd('grim -g "$(slurp)" - | satty --filename -'))
 
   -- Focus via emacs (windmove inside emacs, else hyprland)
-  hl.bind(mainMod .. " + H", hl.dsp.exec_cmd("emacsclient -e \"(hesam/windmove-or-hyprland 'left)\""))
-  hl.bind(mainMod .. " + J", hl.dsp.exec_cmd("emacsclient -e \"(hesam/windmove-or-hyprland 'down)\""))
-  hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("emacsclient -e \"(hesam/windmove-or-hyprland 'up)\""))
-  hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("emacsclient -e \"(hesam/windmove-or-hyprland 'right)\""))
+  hl.bind(mainMod .. " + H", hl.dsp.exec_cmd("emacsclient -e \"(hesam-hyprland-windmove 'left)\""))
+  hl.bind(mainMod .. " + J", hl.dsp.exec_cmd("emacsclient -e \"(hesam-hyprland-windmove 'down)\""))
+  hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("emacsclient -e \"(hesam-hyprland-windmove 'up)\""))
+  hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("emacsclient -e \"(hesam-hyprland-windmove 'right)\""))
 
   -- Focus (backup, no emacs integration)
   hl.bind(mainMod .. " + ALT + H", hl.dsp.focus({ direction = "left" }))
