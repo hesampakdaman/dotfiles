@@ -1064,7 +1064,7 @@ wallpaper's colours appear after restarting it.
   [urgency=normal]
   default-timeout=3000
 
-  [urgency=high]
+  [urgency=critical]
   border-color={{colors.error_container.default.hex}}
   default-timeout=0
 #+end_src
