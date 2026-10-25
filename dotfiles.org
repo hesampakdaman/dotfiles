@@ -1067,6 +1067,9 @@ wallpaper's colours appear after restarting it.
   [urgency=critical]
   border-color={{colors.error_container.default.hex}}
   default-timeout=0
+
+  [app-name=check-updates]
+  text-alignment=center
 #+end_src
 *** rofi
 #+begin_src conf :tangle ~/.config/matugen/rofi-colors.rasi
@@ -1530,7 +1533,7 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
   done
 
   if [ "$status" -ne 0 ] && [ "$status" -ne 2 ]; then
-      notify-send -u critical -i "$icon" "System Update" "Update check failed. See its logs."
+      notify-send -a check-updates -u critical -i "$icon" "System Update" "Update check failed. See its logs."
       exit 1
   fi
 
@@ -1545,7 +1548,7 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
       # Clicking the notification invokes its default action; -t 0 keeps it
       # up until then. Launch the terminal through systemd-run so it
       # outlives this oneshot service.
-      action=$(notify-send -u normal -t 0 -i "$icon" --wait -A "default=Update now" \
+      action=$(notify-send -a check-updates -u normal -t 0 -i "$icon" --wait -A "default=Update now" \
           "System Update" "$total_count $noun. Click to install.")
       if [ "$action" = "default" ]; then
           systemd-run --user --collect --quiet <<terminal>> --title="System Update" \
