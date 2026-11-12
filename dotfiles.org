@@ -1509,6 +1509,17 @@ We only want to set =post_command= in waypaper's config and leave the rest (whic
 
   (hesam-waypaper--inject-postcommand)
 #+end_src
+* wireless-regdb
+Without =wireless-regdb= the kernel can't load =regulatory.db= and falls back to the world domain =00=, which disables 6 GHz and caps transmit power. The package's udev rule runs =set-wireless-regdom= when =cfg80211= loads, applying the country uncommented in =/etc/conf.d/wireless-regdom=, so it takes effect on the next boot (or now with =sudo iw reg reload && sudo set-wireless-regdom=).
+#+begin_src emacs-lisp
+  (system-pkg wireless-regdb
+    :exe set-wireless-regdom
+    :setup
+    ((:unless (with-temp-buffer
+                (ignore-errors (insert-file-contents "/etc/conf.d/wireless-regdom"))
+                (re-search-forward "^WIRELESS_REGDOM=\"SE\"" nil t))
+      :run "sudo sed -i 's/^#WIRELESS_REGDOM=\"SE\"/WIRELESS_REGDOM=\"SE\"/' /etc/conf.d/wireless-regdom")))
+#+end_src
 * scripts
 ** check update
 The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
