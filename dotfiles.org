@@ -660,8 +660,8 @@ Global excludes, referenced by =core.excludesfile=.
   end
 
   -- External display brightness
-  hl.bind(mainMod .. " + F7", hl.dsp.exec_cmd("~/.local/bin/external-backlight.sh - 10"))
-  hl.bind(mainMod .. " + F8", hl.dsp.exec_cmd("~/.local/bin/external-backlight.sh + 10"))
+  hl.bind(mainMod .. " + F7", hl.dsp.exec_cmd("~/.local/bin/external-backlight - 10"))
+  hl.bind(mainMod .. " + F8", hl.dsp.exec_cmd("~/.local/bin/external-backlight + 10"))
 
   -- Session
   hl.bind(mainMod .. " + SHIFT + Q", hl.dsp.exec_cmd("systemctl sleep"))
@@ -796,7 +796,7 @@ Global excludes, referenced by =core.excludesfile=.
   }
 #+end_src
 ** hypridle
-On battery the screen locks after 10 minutes and the machine suspends after 15. On AC it locks after 30 minutes and never suspends. =on-battery.sh= (see [[*on battery][on battery]]) decides which timers act.
+On battery the screen locks after 10 minutes and the machine suspends after 15. On AC it locks after 30 minutes and never suspends. =on-battery= (see [[*on battery][on battery]]) decides which timers act.
 #+begin_src conf :tangle ~/.config/hypr/hypridle.conf
   general {
       lock_cmd = pidof hyprlock || hyprlock # avoid starting multiple hyprlock instances.
@@ -821,18 +821,18 @@ On battery the screen locks after 10 minutes and the machine suspends after 15. 
   # On battery: lock, screen off, then suspend.
   listener {
       timeout = 600
-      on-timeout = ~/.local/bin/on-battery.sh && loginctl lock-session
+      on-timeout = ~/.local/bin/on-battery && loginctl lock-session
   }
 
   listener {
       timeout = 630
-      on-timeout = ~/.local/bin/on-battery.sh && hyprctl dispatch 'hl.dsp.dpms({action = "off"})'
+      on-timeout = ~/.local/bin/on-battery && hyprctl dispatch 'hl.dsp.dpms({action = "off"})'
       on-resume = hyprctl dispatch 'hl.dsp.dpms({action = "on"})' && brightnessctl -r
   }
 
   listener {
       timeout = 900
-      on-timeout = ~/.local/bin/on-battery.sh && (systemctl suspend-then-hibernate || systemctl suspend) # plain suspend where hibernate isn't set up.
+      on-timeout = ~/.local/bin/on-battery && (systemctl suspend-then-hibernate || systemctl suspend) # plain suspend where hibernate isn't set up.
   }
 
   # On AC: lock and screen off, never suspend.
@@ -1571,7 +1571,7 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
       :run "systemctl --user enable --now check-updates.timer")))
 #+end_src
 *** script
-#+begin_src bash :tangle ~/.local/bin/check-updates.sh :shebang "#!/usr/bin/bash" :noweb yes
+#+begin_src bash :tangle ~/.local/bin/check-updates :shebang "#!/usr/bin/bash" :noweb yes
   icon=/usr/share/pixmaps/archlinux-logo.svg
 
   # checkupdates exits 0 with updates, 2 without and anything else on
@@ -1614,7 +1614,7 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
 
   [Service]
   Type=oneshot
-  ExecStart=%h/.local/bin/check-updates.sh
+  ExecStart=%h/.local/bin/check-updates
 #+end_src
 *** timer
 #+begin_src conf :tangle ~/.config/systemd/user/check-updates.timer
@@ -1630,7 +1630,7 @@ The script uses =checkupdates= from =pacman-contrib=; the timer runs it weekly.
 #+end_src
 ** on battery
 Succeeds when a system battery is present and no charger is connected. Desktops count as on AC. Peripheral batteries (mice, headsets) report =scope= =Device= and are skipped.
-#+begin_src bash :tangle ~/.local/bin/on-battery.sh :shebang "#!/bin/sh"
+#+begin_src bash :tangle ~/.local/bin/on-battery :shebang "#!/bin/sh"
   battery=no
   for s in /sys/class/power_supply/*; do
       [ "$(cat "$s/scope" 2>/dev/null)" = Device ] && continue
@@ -1643,7 +1643,7 @@ Succeeds when a system battery is present and no charger is connected. Desktops 
 #+end_src
 ** external backlight
 Control backlight of external monitors with =ddcutil=.
-#+begin_src bash :tangle ~/.local/bin/external-backlight.sh :shebang "#!/bin/bash"
+#+begin_src bash :tangle ~/.local/bin/external-backlight :shebang "#!/bin/bash"
   # setvcp arguments are + N to increase N or - N to decrease
   # $* joins all arguments (e.g. + and 10) into a single string
   ddcutil setvcp 10 $* --noverify
@@ -1657,7 +1657,7 @@ Control backlight of external monitors with =ddcutil=.
 #+end_src
 ** fix layers
 After resume, Hyprland 0.57.1 can draw layer surfaces at alpha 0, hiding the ashell bar and the awww wallpaper while both keep running. Restarting them gives fresh, visible layers. The script prints each layer's alpha before and after.
-#+begin_src bash :tangle ~/.local/bin/fix-layers.sh :shebang "#!/bin/bash"
+#+begin_src bash :tangle ~/.local/bin/fix-layers :shebang "#!/bin/bash"
   show() { hyprctl -j layers | jq -r '.[].levels[][] | "  \(.namespace)  alpha=\(.alpha)"'; }
 
   echo before:; show
