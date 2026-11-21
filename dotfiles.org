@@ -1618,6 +1618,25 @@ Control backlight of external monitors with =ddcutil=.
   # Trigger SwayOSD to show the bar
   swayosd-client --brightness "$current"
 #+end_src
+** fix layers
+After resume, Hyprland 0.57.1 can draw layer surfaces at alpha 0, hiding the ashell bar and the awww wallpaper while both keep running. Restarting them gives fresh, visible layers. The script prints each layer's alpha before and after.
+#+begin_src bash :tangle ~/.local/bin/fix-layers.sh :shebang "#!/bin/bash"
+  show() { hyprctl -j layers | jq -r '.[].levels[][] | "  \(.namespace)  alpha=\(.alpha)"'; }
+
+  echo before:; show
+
+  systemctl --user restart ashell.service
+
+  # Launch through Hyprland so the daemon outlives this shell.
+  awww kill
+  for _ in $(seq 50); do pgrep -x awww-daemon >/dev/null || break; sleep 0.1; done
+  hyprctl dispatch 'hl.dsp.exec_cmd("awww-daemon")' >/dev/null
+  for _ in $(seq 50); do awww query >/dev/null 2>&1 && break; sleep 0.1; done
+  awww img "$(cat ~/.local/state/wallpaper_path)" --transition-type none
+
+  sleep 0.5
+  echo after:; show
+#+end_src
 * packages
 #+begin_src emacs-lisp
   (system-pkg awww)
