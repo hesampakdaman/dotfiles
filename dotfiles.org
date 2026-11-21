@@ -1674,6 +1674,34 @@ After resume, Hyprland 0.57.1 can draw layer surfaces at alpha 0, hiding the ash
   sleep 0.5
   echo after:; show
 #+end_src
+** wifi band
+Switch the active Wi-Fi connection between bands. NetworkManager prefers 6 GHz even when its signal is much weaker than 5 GHz on the same access point, and its =band= setting only knows =a= (5 GHz) and =bg= (2.4 GHz). So =6= pins the strongest 6 GHz access point of the current network instead. =auto= clears both locks. Without an argument the script shows the current link.
+#+begin_src bash :tangle ~/.local/bin/wifi-band :shebang "#!/bin/bash"
+  set -e
+  dev=$(nmcli -t -f DEVICE,TYPE dev | awk -F: '$2 == "wifi" { print $1; exit }')
+  con=$(nmcli -g GENERAL.CONNECTION dev show "$dev")
+  [ -n "$con" ] || { echo "$dev is not connected" >&2; exit 1; }
+
+  case $1 in
+      5) nmcli con mod "$con" 802-11-wireless.band a 802-11-wireless.bssid "" ;;
+      6)
+          ssid=$(nmcli -g 802-11-wireless.ssid con show "$con")
+          # -e no leaves colons unescaped, so split off the fixed-width
+          # BSSID and treat the rest as the SSID (which may contain colons).
+          bssid=$(nmcli -t -e no -f FREQ,SIGNAL,BSSID,SSID dev wifi list ifname "$dev" --rescan yes |
+              while IFS=: read -r freq signal rest; do
+                  [ "${freq% MHz}" -ge 5925 ] && [ "${rest:18}" = "$ssid" ] && echo "$signal ${rest:0:17}"
+              done | sort -rn | awk 'NR == 1 { print $2 }')
+          [ -n "$bssid" ] || { echo "no 6 GHz access point for $ssid" >&2; exit 1; }
+          nmcli con mod "$con" 802-11-wireless.band "" 802-11-wireless.bssid "$bssid" ;;
+      auto) nmcli con mod "$con" 802-11-wireless.band "" 802-11-wireless.bssid "" ;;
+      "") ;;
+      *) echo "usage: wifi-band [5|6|auto]" >&2; exit 2 ;;
+  esac
+
+  [ -n "$1" ] && nmcli con up "$con" >/dev/null && sleep 2
+  iw dev "$dev" link | grep -E 'Connected|freq|signal|rx bitrate'
+#+end_src
 * packages
 #+begin_src emacs-lisp
   (system-pkg awww)
