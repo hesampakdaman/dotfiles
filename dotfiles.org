@@ -1267,6 +1267,43 @@ Colours for the [[https://github.com/uiriansan/SilentSDDM][SilentSDDM]] login sc
   s cycle sub
   S cycle sub down
 #+end_src
+* pipewire
+=pipewire-zeroconf= provides the RAOP (AirPlay) modules. With discovery on, AirPlay receivers such as the Sonos Beam show up as output sinks.
+
+firewalld's default =public= zone blocks both discovery (mDNS) and the speaker's timing and control connections back to the laptop, so the home Wi-Fi goes in the =trusted= zone. Other networks stay =public=. The connection's name is kept out of this public repo, in the untracked =~/.config/home-wifi=; without that file the step is skipped.
+#+begin_src emacs-lisp
+  (defun hesam-home-wifi ()
+    "Name of the home Wi-Fi connection from ~/.config/home-wifi, or nil."
+    (let ((file (expand-file-name "home-wifi" (xdg-config-home))))
+      (when (file-readable-p file)
+        (with-temp-buffer
+          (insert-file-contents file)
+          (string-trim (buffer-string))))))
+
+  (system-pkg pipewire-zeroconf
+    :setup
+    ((:unless (let ((wifi (hesam-home-wifi)))
+                (or (not wifi)
+                    (with-temp-buffer
+                      (or (/= 0 (call-process "nmcli" nil t nil "-g" "connection.zone"
+                                              "connection" "show" wifi))
+                          (string= (string-trim (buffer-string)) "trusted")))))
+      :run (format "nmcli connection modify %s connection.zone trusted"
+                   (shell-quote-argument (hesam-home-wifi))))))
+#+end_src
+** raop
+#+begin_src conf :tangle ~/.config/pipewire/pipewire.conf.d/raop.conf
+  context.modules = [
+    { name = libpipewire-module-raop-discover }
+  ]
+#+end_src
+** wireplumber
+Don't remember a per-app output. Every stream follows the default sink, so switching output in the bar moves all audio.
+#+begin_src conf :tangle ~/.config/wireplumber/wireplumber.conf.d/no-restore-target.conf
+  wireplumber.settings = {
+    node.stream.restore-target = false
+  }
+#+end_src
 * rofi
 #+begin_src emacs-lisp
   (system-pkg rofi)
