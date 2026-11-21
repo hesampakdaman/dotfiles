@@ -26,8 +26,11 @@ Values shared by several configs, inserted with noweb (=<<font>>=, =<<editor>>=,
   ghostty
 #+end_src
 * ashell
+=ashell-git= until the Hyprland 0.57 workspace fix ([[https://github.com/MalpenZibo/ashell/issues/1118][#1118]]) is in a
+release (after 0.11.0); then switch back to =ashell=.
 #+begin_src emacs-lisp
-  (system-pkg ashell
+  (system-pkg ashell-git
+    :exe ashell
     :setup
     ((:unless (system-pkg-unit-enabled-p "ashell.service")
       :run "systemctl --user enable --now ashell.service")))
