@@ -421,7 +421,10 @@ Global excludes, referenced by =core.excludesfile=.
 #+begin_src emacs-lisp
   (system-pkg hyprland :exe Hyprland)
   (system-pkg hyprlock)
-  (system-pkg hypridle)
+  (system-pkg hypridle
+    :setup
+    ((:unless (file-exists-p "/etc/systemd/logind.conf.d/lid-on-ac.conf")
+      :run "sudo install -d /etc/systemd/logind.conf.d && printf '[Login]\\nHandleLidSwitchExternalPower=lock\\n' | sudo tee /etc/systemd/logind.conf.d/lid-on-ac.conf >/dev/null && sudo systemctl reload systemd-logind")))
 #+end_src
 ** hyprland
 #+begin_src lua :tangle ~/.config/hypr/hyprland.lua :noweb yes
@@ -689,6 +692,14 @@ Global excludes, referenced by =core.excludesfile=.
   ---- WINDOWS AND WORKSPACES ----
   --------------------------------
 
+  -- Reading doesn't count as idle: no dimming, screen off or suspend
+  -- while Foliate has focus.
+  hl.window_rule({
+      name         = "foliate-idle-inhibit",
+      match        = { class = "com.github.johnfactotum.Foliate" },
+      idle_inhibit = "focus",
+  })
+
   -- Opacity overrides
   hl.window_rule({
       name    = "mpv-opaque",
@@ -796,7 +807,14 @@ Global excludes, referenced by =core.excludesfile=.
   }
 #+end_src
 ** hypridle
-On battery the screen locks after 10 minutes and the machine suspends after 15. On AC it locks after 30 minutes and never suspends. =on-battery= (see [[*on battery][on battery]]) decides which timers act.
+| idle    | screen off | lock   | suspend |
+|---------+------------+--------+---------|
+| battery | 3 min      | 5 min  | 10 min  |
+| AC      | 5 min      | 10 min | 30 min  |
+
+=on-battery= (see [[*on battery][on battery]]) decides which timers act. Suspend goes through =suspend-when-free= (see [[*suspend when free][suspend when free]]), so anything holding a sleep inhibitor, such as a media server streaming to another device, keeps the machine up while the screen still turns off. Idle inhibitors (video players, the ashell toggle, the Foliate window rule) stop all of it.
+
+On AC, closing the lid locks instead of suspending (=HandleLidSwitchExternalPower=lock=, installed above), so the machine stays reachable and the AC suspend timer takes over. On battery it still suspends right away.
 #+begin_src conf :tangle ~/.config/hypr/hypridle.conf
   general {
       lock_cmd = pidof hyprlock || hyprlock # avoid starting multiple hyprlock instances.
@@ -818,33 +836,42 @@ On battery the screen locks after 10 minutes and the machine suspends after 15. 
       on-resume = brightnessctl -rd rgb:kbd_backlight        # turn on keyboard backlight.
   }
 
-  # On battery: lock, screen off, then suspend.
+  # Screen off: 3 min on battery, 5 on AC.
   listener {
-      timeout = 600
-      on-timeout = ~/.local/bin/on-battery && loginctl lock-session
-  }
-
-  listener {
-      timeout = 630
+      timeout = 180
       on-timeout = ~/.local/bin/on-battery && hyprctl dispatch 'hl.dsp.dpms({action = "off"})'
       on-resume = hyprctl dispatch 'hl.dsp.dpms({action = "on"})' && brightnessctl -r
   }
 
   listener {
-      timeout = 900
-      on-timeout = ~/.local/bin/on-battery && (systemctl suspend-then-hibernate || systemctl suspend) # plain suspend where hibernate isn't set up.
+      timeout = 300
+      on-timeout = ~/.local/bin/on-battery || hyprctl dispatch 'hl.dsp.dpms({action = "off"})'
+      on-resume = hyprctl dispatch 'hl.dsp.dpms({action = "on"})' && brightnessctl -r
   }
 
-  # On AC: lock and screen off, never suspend.
+  # Lock: 5 min on battery, 10 on AC.
+  listener {
+      timeout = 300
+      on-timeout = ~/.local/bin/on-battery && loginctl lock-session
+  }
+
+  listener {
+      timeout = 600
+      on-timeout = ~/.local/bin/on-battery || loginctl lock-session
+  }
+
+  # Suspend: 10 min on battery, 30 on AC. The anchored pattern matches
+  # only the waiting script, not shells or editors that mention its name.
+  listener {
+      timeout = 600
+      on-timeout = ~/.local/bin/on-battery && ~/.local/bin/suspend-when-free
+      on-resume = pkill -f '^/bin/sh [^ ]*/suspend-when-free$'
+  }
+
   listener {
       timeout = 1800
-      on-timeout = loginctl lock-session
-  }
-
-  listener {
-      timeout = 1860
-      on-timeout = hyprctl dispatch 'hl.dsp.dpms({action = "off"})'
-      on-resume = hyprctl dispatch 'hl.dsp.dpms({action = "on"})' && brightnessctl -r
+      on-timeout = ~/.local/bin/on-battery || ~/.local/bin/suspend-when-free
+      on-resume = pkill -f '^/bin/sh [^ ]*/suspend-when-free$'
   }
 #+end_src
 * matugen
@@ -1640,6 +1667,15 @@ Succeeds when a system battery is present and no charger is connected. Desktops 
       esac
   done
   [ "$battery" = yes ]
+#+end_src
+** suspend when free
+Suspends once nothing holds a =block= sleep inhibitor. hypridle runs it at its suspend timeout and kills it on activity, so a machine that's busy (say, streaming media to another device) stays up and suspends shortly after it's done, without waiting for another full idle period.
+#+begin_src bash :tangle ~/.local/bin/suspend-when-free :shebang "#!/bin/sh"
+  while busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
+          org.freedesktop.login1.Manager BlockInhibited | grep -q sleep; do
+      sleep 30
+  done
+  systemctl suspend-then-hibernate || systemctl suspend # plain suspend where hibernate isn't set up.
 #+end_src
 ** external backlight
 Control backlight of external monitors with =ddcutil=.
